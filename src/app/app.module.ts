@@ -5,7 +5,10 @@ import { NgModule } from "@angular/core";
 
 import { AppComponent } from "./app.component";
 import { AppRoutes } from "./app.routes";
+import { HTTP_INTERCEPTORS, HttpClientModule } from "@angular/common/http";
+
 import { DashboardModule } from "./views/dashboard/dashboard.module";
+import { ApiInterceptor } from "./interceptors/api.interceptor";
 
 @NgModule({
     declarations: [
@@ -15,9 +18,16 @@ import { DashboardModule } from "./views/dashboard/dashboard.module";
         BrowserModule,
         RouterModule.forRoot(AppRoutes),
         BrowserAnimationsModule,
-        DashboardModule
+        DashboardModule,
+        HttpClientModule
     ],
-    providers: [],
+    providers: [
+        {
+            provide: HTTP_INTERCEPTORS,
+            useClass: ApiInterceptor,
+            multi: true
+        }
+    ],
     bootstrap: [AppComponent]
 })
 export class AppModule {

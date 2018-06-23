@@ -15,14 +15,13 @@ export class ApiInterceptor implements HttpInterceptor {
             url: [API_URL, req.url].join("")
         });
 
-        /*const user = this.sessionService.userSnapshot;
+        const user = this.sessionService.userSnapshot;
         if (user) {
             const authorization = ["Bearer", user.token].join(" ");
             request = request.clone({
                 headers: request.headers.set("Authorization", authorization)
             });
         }
-*/
         return next.handle(request);
     }
 }

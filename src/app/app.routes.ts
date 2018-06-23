@@ -1,4 +1,5 @@
 import { AuthCallbackComponent } from "./shared/auth-callback/auth-callback.component";
+import { PageNotFoundComponent } from "./views/page-not-found/page-not-found.component";
 
 export const AppRoutes = [
     {
@@ -15,6 +16,10 @@ export const AppRoutes = [
             {
                 path: "oauth",
                 component: AuthCallbackComponent
+            },
+            {
+                path: "**",
+                component: PageNotFoundComponent
             }
         ]
     }

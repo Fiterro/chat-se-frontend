@@ -13,14 +13,6 @@ export class SessionService {
     private readonly innerUser = new BehaviorSubject<User | undefined>(undefined);
     private readonly userStorage = new AppStorage<UserData>(localStorage, "user");
 
-    get user(): Observable<User | undefined> {
-        return this.innerUser.asObservable();
-    }
-
-    get userSnapshot(): User | undefined {
-        return this.innerUser.getValue();
-    }
-
     constructor() {
         const user = this.userStorage.getItem();
 
@@ -36,6 +28,14 @@ export class SessionService {
                     this.userStorage.setItem(u);
                 }
             });
+    }
+
+    get user(): Observable<User | undefined> {
+        return this.innerUser.asObservable();
+    }
+
+    get userSnapshot(): User | undefined {
+        return this.innerUser.getValue();
     }
 
     set(u: User): void {

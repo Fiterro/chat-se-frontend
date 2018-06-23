@@ -1,0 +1,14 @@
+@mixin display-grid {
+    display: -ms-grid;
+    display: grid;
+}
+
+@mixin grid-child($col-start, $col-end, $row-start, $row-end) {
+    @include display-grid;
+    -ms-grid-column: $col-start;
+    -ms-grid-column-span: $col-end - $col-start;
+    -ms-grid-row: $row-start;
+    -ms-grid-row-span: $row-end - $row-start;
+    grid-column: #{$col-start}/#{$col-end};
+    grid-row: #{$row-start}/#{$row-end};
+}

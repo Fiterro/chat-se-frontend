@@ -1,7 +1,7 @@
 import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { RouterModule } from "@angular/router";
-import { HttpClientModule } from "@angular/common/http";
+import { MatButtonModule, MatCardModule, MatTabsModule } from "@angular/material";
 
 import { AuthComponent } from "./auth.component";
 import { AuthRoutes } from "./auth.routes";
@@ -10,9 +10,13 @@ import { AuthRoutes } from "./auth.routes";
     imports: [
         CommonModule,
         RouterModule.forChild(AuthRoutes),
-        HttpClientModule
+        MatCardModule,
+        MatButtonModule,
+        MatTabsModule
     ],
-    declarations: [AuthComponent]
+    declarations: [
+        AuthComponent
+    ]
 })
 export class AuthModule {
 }

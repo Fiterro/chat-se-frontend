@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit } from "@angular/core";
+import { ChangeDetectionStrategy, Component } from "@angular/core";
 
 import { AuthService } from "../../services/auth.service";
 
@@ -8,14 +8,17 @@ import { AuthService } from "../../services/auth.service";
     styleUrls: ["./auth.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AuthComponent implements OnInit {
+export class AuthComponent {
 
     constructor(private readonly authService: AuthService) {
     }
 
-    ngOnInit(): void {
+    signIn(): void {
         this.authService.signinGoogle()
-            .subscribe(console.log);
+            .subscribe(
+                (googleLink) => window.location.href = googleLink,
+                (error) => console.log(error)
+            );
     }
 
 }

@@ -5,6 +5,7 @@ import { RouterModule } from "@angular/router";
 import { DashboardComponent } from "./dashboard.component";
 import { DashboardRoutes } from "./dashboard.routes";
 import { MatButtonModule, MatIconModule, MatListModule, MatSidenavModule, MatToolbarModule } from "@angular/material";
+import { ChatModule } from "../chat/chat.module";
 
 @NgModule({
     imports: [
@@ -14,7 +15,8 @@ import { MatButtonModule, MatIconModule, MatListModule, MatSidenavModule, MatToo
         MatListModule,
         MatIconModule,
         MatToolbarModule,
-        MatButtonModule
+        MatButtonModule,
+        ChatModule
     ],
     declarations: [DashboardComponent]
 })

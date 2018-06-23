@@ -1,0 +1,26 @@
+@import "../../../assets/scss/grid";
+
+:host {
+    @include display-grid;
+    width: 100vw;
+    height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 40px 15px;
+    box-sizing: border-box;
+}
+
+.auth {
+
+    &__container {
+        @include grid-child(1, 1, 1, 1);
+        max-width: 320px;
+        max-height: 480px;
+        margin: 0 auto;
+        grid-template-rows: 40px auto;
+    }
+
+    &__title {
+        font-size: 1.5rem;
+    }
+}

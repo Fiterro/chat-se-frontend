@@ -1,18 +1,19 @@
 import { BrowserModule } from "@angular/platform-browser";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { HTTP_INTERCEPTORS, HttpClientModule } from "@angular/common/http";
 import { RouterModule } from "@angular/router";
 import { NgModule } from "@angular/core";
 
 import { AppComponent } from "./app.component";
 import { AppRoutes } from "./app.routes";
-import { HTTP_INTERCEPTORS, HttpClientModule } from "@angular/common/http";
-
 import { DashboardModule } from "./views/dashboard/dashboard.module";
 import { ApiInterceptor } from "./interceptors/api.interceptor";
+import { AuthCallbackComponent } from "./shared/auth-callback/auth-callback.component";
 
 @NgModule({
     declarations: [
-        AppComponent
+        AppComponent,
+        AuthCallbackComponent
     ],
     imports: [
         BrowserModule,

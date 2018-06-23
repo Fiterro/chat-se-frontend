@@ -1,0 +1,27 @@
+@import "../../../assets/scss/grid";
+
+#page {
+    @include display-grid;
+    height: 100vh;
+    grid-template-rows: max-content auto max-content;
+
+    header {
+        @include grid-child(1, 1, 1, 1);
+    }
+
+    #content {
+        @include grid-child(1, 1, 2, auto);
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
+    footer {
+    }
+}
+
+.db {
+
+    &__sidenav {
+        width: 320px;
+    }
+}

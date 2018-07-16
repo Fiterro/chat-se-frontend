@@ -1,16 +1,36 @@
-import { Component, OnInit } from "@angular/core";
+import { ChangeDetectionStrategy, Component, OnInit } from "@angular/core";
+import { ChatsService } from "../../../services/chats.service";
+import { FormControl, FormGroup, Validators } from "@angular/forms";
+import { Observable, of } from "rxjs";
 
 @Component({
     selector: "app-chat-input",
     templateUrl: "./chat-input.component.html",
-    styleUrls: ["./chat-input.component.css"]
+    styleUrls: ["./chat-input.component.scss"],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ChatInputComponent implements OnInit {
+    messageForm: FormGroup;
 
-    constructor() {
+    constructor(private readonly chatsService: ChatsService) {
     }
 
-    ngOnInit() {
+    get invalidForm(): Observable<boolean> {
+        return of(this.messageForm.invalid);
     }
 
+    ngOnInit(): void {
+        this.messageForm = new FormGroup(
+            {
+                message: new FormControl("", [Validators.required])
+            },
+            {}
+        );
+    }
+
+    sendMessage(): void {
+        if (this.messageForm.valid) {
+            this.chatsService.sendMessage(this.messageForm.get("message").value);
+        }
+    }
 }

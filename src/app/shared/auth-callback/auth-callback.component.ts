@@ -1,10 +1,12 @@
-import { Component, OnInit } from "@angular/core";
+import { ChangeDetectionStrategy, Component, OnInit } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
+
 import { AuthService } from "../../services/auth.service";
 
 @Component({
     selector: "app-auth-callback",
-    template: ""
+    template: "",
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AuthCallbackComponent implements OnInit {
     private code: string;
@@ -21,8 +23,8 @@ export class AuthCallbackComponent implements OnInit {
     ngOnInit(): void {
         this.authService.signinGoogleCallback(this.code)
             .subscribe(
-                (result) => this.router.navigate([""], {relativeTo: this.activatedRoute.root}),
-                (error) => this.router.navigate([""], {relativeTo: this.activatedRoute.root})
+                () => this.router.navigate([""], {relativeTo: this.activatedRoute.root}),
+                () => this.router.navigate([""], {relativeTo: this.activatedRoute.root})
             );
     }
 }

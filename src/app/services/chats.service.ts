@@ -1,12 +1,14 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
-import { BehaviorSubject, empty, Observable } from "rxjs";
+import { BehaviorSubject, Observable } from "rxjs";
 import { filter, map, share, tap } from "rxjs/operators";
 
 import { API_ROOT_CHAT } from "../app.constants";
 import { ResponseModel } from "../core/types/response-model.type";
 import { Chat } from "../core/classes/chat";
 import { ChatData } from "../core/types/chat-data.type";
+import { Message } from "../core/classes/message";
+import { MessageData } from "../core/types/message-data.type";
 
 @Injectable()
 export class ChatsService {
@@ -50,9 +52,22 @@ export class ChatsService {
         }
     }
 
-    sendMessage(message: string): Observable<any> {
-        console.log(message);
-        return empty();
+    sendMessage(text: string): Observable<any> {
+        const chatId = this.activeChatId.getValue();
+        return this.httpClient
+            .post<ResponseModel<any>>(`${this.API_ROOT}/messages`, {chatId, text})
+            .pipe(
+                map(({data}) => data)
+            );
+    }
+
+    getMessages(chatId?: number): Observable<Message[]> {
+        const id = chatId ? chatId : this.activeChatId.getValue();
+        return this.httpClient
+            .get<ResponseModel<MessageData[]>>(`${this.API_ROOT}/${id}/messages`)
+            .pipe(
+                map(({data}) => data.map((message) => new Message(message)))
+            );
     }
 
     private retrieveChatList(): Observable<Chat[]> {

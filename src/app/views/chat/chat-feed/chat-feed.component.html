@@ -1,3 +1,24 @@
-<div *ngIf="activeChat | async">
-    Here will be some messages
+<div class="chat__feed-container" *ngIf="activeChat | async">
+    <div *ngIf="(messages | async).length; then messagesList else noMessages"></div>
+    <ng-template #messagesList>
+        <div class="chat__message" *ngFor="let message of (messages | async) as messages">
+            <div class="chat__message-avatar">
+                <div *ngIf="message?.sender?.avatar; then avatarView else noAvatar"></div>
+                <ng-template #avatarView>
+                    <img src="" alt="avatar">
+                </ng-template>
+                <ng-template #noAvatar>
+                    <span class="chat__message-avatar-letter">
+                        {{'firstName' | capitalizeFirst}}
+                    </span>
+                </ng-template>
+            </div>
+            <div class="chat__message-body">
+                <div class="chat__message-text">{{message.text}}</div>
+                <div class="chat__message-date">{{message.createdAt | date:'short'}}</div>
+            </div>
+            <mat-divider class="chat__message-divider"></mat-divider>
+        </div>
+    </ng-template>
+    <ng-template #noMessages></ng-template>
 </div>

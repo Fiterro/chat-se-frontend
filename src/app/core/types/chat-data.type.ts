@@ -1,6 +1,6 @@
 export type ChatData = Readonly<{
     id: number,
     name: string,
-    createdAt: string,
-    updatedAt: string
+    created_at: string,
+    updated_at: string
 }>;

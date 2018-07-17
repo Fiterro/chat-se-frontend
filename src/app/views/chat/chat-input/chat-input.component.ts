@@ -30,7 +30,10 @@ export class ChatInputComponent implements OnInit {
 
     sendMessage(): void {
         if (this.messageForm.valid) {
-            this.chatsService.sendMessage(this.messageForm.get("message").value);
+            this.chatsService.sendMessage(this.messageForm.get("message").value)
+                .subscribe(() => {
+                    this.messageForm.reset();
+                });
         }
     }
 }

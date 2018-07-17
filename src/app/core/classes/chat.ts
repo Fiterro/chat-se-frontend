@@ -9,7 +9,7 @@ export class Chat {
     constructor(data: ChatData) {
         this.id = data.id;
         this.name = data.name;
-        this.createdAt = new Date(data.createdAt);
-        this.updatedAt = new Date(data.updatedAt);
+        this.createdAt = new Date(data.created_at);
+        this.updatedAt = new Date(data.updated_at);
     }
 }

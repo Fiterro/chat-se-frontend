@@ -7,6 +7,8 @@ import { ChatInputComponent } from "./chat-input/chat-input.component";
 import { ChatListComponent } from "./chat-list/chat-list.component";
 import { MatButtonModule, MatFormFieldModule, MatIconModule, MatInputModule, MatListModule } from "@angular/material";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { ChatMessageComponent } from './chat-message/chat-message.component';
+import { CapitalizeFirstModule } from "../../shared/pipes/capitalize-first/capitalize-first.module";
 
 @NgModule({
     imports: [
@@ -17,13 +19,15 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
         MatInputModule,
         MatFormFieldModule,
         MatIconModule,
-        MatButtonModule
+        MatButtonModule,
+        CapitalizeFirstModule
     ],
     declarations: [
         ChatMainComponent,
         ChatFeedComponent,
         ChatInputComponent,
-        ChatListComponent
+        ChatListComponent,
+        ChatMessageComponent
     ],
     exports: [
         ChatMainComponent,

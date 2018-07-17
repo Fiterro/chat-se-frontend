@@ -1,0 +1,19 @@
+<div class="chat__message">
+    <div class="chat__message-avatar">
+        <!-- TODO: implement message sender model -->
+        <div *ngIf="message?.sender?.avatar; then avatarView else noAvatar"></div>
+        <ng-template #avatarView>
+            <img src="" alt="avatar">
+        </ng-template>
+        <ng-template #noAvatar>
+                    <span class="chat__message-avatar-letter">
+                        {{'firstName' | capitalizeFirst}}
+                    </span>
+        </ng-template>
+    </div>
+    <div class="chat__message-body">
+        <div class="chat__message-text">{{message.text}}</div>
+        <div class="chat__message-date">{{message.createdAt | date:'short'}}</div>
+    </div>
+    <mat-divider class="chat__message-divider"></mat-divider>
+</div>

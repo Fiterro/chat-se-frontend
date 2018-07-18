@@ -9,6 +9,7 @@ import { Chat } from "../core/classes/chat";
 import { ChatData } from "../core/types/chat-data.type";
 import { Message } from "../core/classes/message";
 import { MessageData } from "../core/types/message-data.type";
+import { SessionService } from "./session.service";
 
 @Injectable()
 export class ChatsService {
@@ -16,7 +17,8 @@ export class ChatsService {
     private chatsList = new BehaviorSubject<Chat[] | undefined>(undefined);
     private activeChatId = new BehaviorSubject<number | undefined>(undefined);
 
-    constructor(private readonly httpClient: HttpClient) {
+    constructor(private readonly httpClient: HttpClient,
+                private readonly sessionSerivce: SessionService) {
     }
 
     get chats(): Observable<Chat[]> {
@@ -54,8 +56,14 @@ export class ChatsService {
 
     sendMessage(text: string): Observable<any> {
         const chatId = this.activeChatId.getValue();
+        const senderId = this.sessionSerivce.userSnapshot.id;
+        const dataToSend = {
+            chatId,
+            text,
+            senderId
+        };
         return this.httpClient
-            .post<ResponseModel<any>>(`${this.API_ROOT}/messages`, {chatId, text})
+            .post<ResponseModel<any>>(`${this.API_ROOT}/messages`, dataToSend)
             .pipe(
                 map(({data}) => data)
             );

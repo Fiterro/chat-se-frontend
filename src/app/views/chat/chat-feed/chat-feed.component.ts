@@ -4,6 +4,7 @@ import { BehaviorSubject, Observable } from "rxjs";
 import { ChatsService } from "../../../services/chats.service";
 import { Chat } from "../../../core/classes/chat";
 import { Message } from "../../../core/classes/message";
+import { PaginationParams } from "../../../core/classes/pagination-params";
 
 @Component({
     selector: "app-chat-feed",
@@ -13,6 +14,9 @@ import { Message } from "../../../core/classes/message";
 })
 export class ChatFeedComponent implements OnInit {
     private readonly messageStorage = new BehaviorSubject<Message[]>([]);
+    private pagination: PaginationParams ;
+    private loadMore = true;
+    private chatId: number;
 
     constructor(private readonly chatsService: ChatsService) {
     }
@@ -20,7 +24,11 @@ export class ChatFeedComponent implements OnInit {
     ngOnInit(): void {
         this.activeChat
             .subscribe((chat) => {
+                this.pagination = new PaginationParams();
+                this.messageStorage.next([]);
                 this.loadChatMessages(chat.id);
+                this.loadMore = true;
+                this.chatId = chat.id;
             });
     }
 
@@ -33,9 +41,23 @@ export class ChatFeedComponent implements OnInit {
     }
 
     private loadChatMessages(chatId: number): void {
-        this.chatsService.getMessages(chatId)
-            .subscribe((messages) => {
-                this.messageStorage.next(messages);
+        this.chatsService.getMessages(chatId, this.pagination)
+            .subscribe(({data, pagination}) => {
+                this.messageStorage.next([
+                    ...data,
+                    ...this.messageStorage.getValue()
+                ]);
+                this.pagination.next();
+
+                if (this.messageStorage.getValue().length >= pagination.total) {
+                    this.loadMore = false;
+                }
             });
+    }
+
+    onScroll(target: HTMLElement): void {
+        if (target.scrollTop === 0 && this.loadMore) {
+            this.loadChatMessages(this.chatId);
+        }
     }
 }

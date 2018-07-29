@@ -10,6 +10,8 @@ import { ChatData } from "../core/types/chat-data.type";
 import { Message } from "../core/classes/message";
 import { MessageData } from "../core/types/message-data.type";
 import { SessionService } from "./session.service";
+import { PaginationParams } from "../core/classes/pagination-params";
+import { ResponseListModel } from "../core/types/response-list-model.type";
 
 @Injectable()
 export class ChatsService {
@@ -77,13 +79,18 @@ export class ChatsService {
             );
     }
 
-    getMessages(chatId?: number): Observable<Message[]> {
+    getMessages(chatId?: number, params?: PaginationParams): Observable<{data: Message[], pagination: { total: number }}> {
         const id = chatId ? chatId : this.activeChatId.getValue();
+        const paramsToSend = params ? params.toHttpParams() : new PaginationParams().toHttpParams();
         return this.httpClient
-            .get<ResponseModel<MessageData[]>>(`${this.API_ROOT}/${id}/messages`)
+            .get<ResponseListModel<MessageData>>(`${this.API_ROOT}/${id}/messages`, {params: paramsToSend})
             .pipe(
-                tap(console.log),
-                map(({data}) => data.map((message) => new Message(message)))
+                map((response) => {
+                    return {
+                        data: response.data.map((message) => new Message(message)),
+                        pagination: response.pagination
+                    };
+                })
             );
     }
 

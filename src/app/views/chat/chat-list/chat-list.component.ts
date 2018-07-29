@@ -1,7 +1,10 @@
 import { ChangeDetectionStrategy, Component } from "@angular/core";
+import { Observable } from "rxjs";
+import { MatDialog } from "@angular/material";
+
 import { ChatsService } from "../../../services/chats.service";
 import { Chat } from "../../../core/classes/chat";
-import { Observable } from "rxjs";
+import { ChatCreateDialogComponent } from "../chat-create-dialog/chat-create-dialog.component";
 
 @Component({
     selector: "app-chat-list",
@@ -11,7 +14,8 @@ import { Observable } from "rxjs";
 })
 export class ChatListComponent {
 
-    constructor(private readonly chatsService: ChatsService) {
+    constructor(private readonly chatsService: ChatsService,
+                private readonly matDialog: MatDialog) {
     }
 
     get chats(): Observable<Chat[]> {
@@ -20,5 +24,16 @@ export class ChatListComponent {
 
     selectChat(chatId: number): void {
         this.chatsService.selectChat(chatId);
+    }
+
+    onCreateClick(): void {
+        const dialogRef = this.matDialog.open(ChatCreateDialogComponent, {width: "320px", hasBackdrop: true, disableClose: true});
+
+        dialogRef.afterClosed()
+            .subscribe(result => {
+                if (result) {
+                    this.chatsService.createChat(result).subscribe();
+                }
+        });
     }
 }

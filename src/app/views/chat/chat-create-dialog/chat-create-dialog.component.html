@@ -1,0 +1,12 @@
+<form [formGroup]="formGroup" (ngSubmit)="submitForm()">
+    <div>
+        <mat-form-field>
+            <input matInput placeholder="Chat name" [formControlName]="'chatName'">
+            <mat-error *ngIf="invalidForm | async">Chat name is required</mat-error>
+        </mat-form-field>
+    </div>
+    <div>
+        <button mat-flat-button="default" (click)="matDialogRef.close()">Canced</button>
+        <button mat-flat-button="primary" type="submit">Ok</button>
+    </div>
+</form>

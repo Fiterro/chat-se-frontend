@@ -18,7 +18,7 @@ export class ChatsService {
     private activeChatId = new BehaviorSubject<number | undefined>(undefined);
 
     constructor(private readonly httpClient: HttpClient,
-                private readonly sessionSerivce: SessionService) {
+                private readonly sessionService: SessionService) {
     }
 
     get chats(): Observable<Chat[]> {
@@ -29,7 +29,7 @@ export class ChatsService {
                         this.chatsList.next(chats);
                         return chats;
                     }),
-                    tap((chats) => this.activeChatId.next(chats[0].id)),
+                    tap((chats) => chats[0] && this.activeChatId.next(chats[0].id)),
                     share()
                 );
         }
@@ -54,9 +54,17 @@ export class ChatsService {
         }
     }
 
+    createChat(name: string): Observable<Chat> {
+        return this.httpClient.post<ResponseModel<Chat>>(`${this.API_ROOT}`, {name})
+            .pipe(
+                map(({data}) => data),
+                tap((chat: Chat) => this.chatsList.next([...this.chatsList.getValue(), chat]))
+            );
+    }
+
     sendMessage(text: string): Observable<any> {
         const chatId = this.activeChatId.getValue();
-        const senderId = this.sessionSerivce.userSnapshot.id;
+        const senderId = this.sessionService.userSnapshot.id;
         const dataToSend = {
             chatId,
             text,
@@ -74,6 +82,7 @@ export class ChatsService {
         return this.httpClient
             .get<ResponseModel<MessageData[]>>(`${this.API_ROOT}/${id}/messages`)
             .pipe(
+                tap(console.log),
                 map(({data}) => data.map((message) => new Message(message)))
             );
     }

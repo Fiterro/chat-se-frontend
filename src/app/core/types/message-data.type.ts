@@ -6,6 +6,7 @@ export type MessageData = Readonly<{
     text: string,
     status: number,
     viewCount: number,
+    sentAt: string,
     createdAt: string,
     updatedAt: string
 }>;

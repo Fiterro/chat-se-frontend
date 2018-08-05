@@ -9,6 +9,7 @@ export class Message {
     readonly text: string;
     readonly status: number;
     readonly viewCount: number;
+    readonly sentAt: Date;
     readonly createdAt: Date;
     readonly updatedAt: Date;
 
@@ -20,6 +21,7 @@ export class Message {
         this.text = data.text;
         this.status = data.status;
         this.viewCount = data.viewCount ? data.viewCount : 0;
+        this.sentAt = new Date(data.sentAt);
         this.createdAt = new Date(data.createdAt);
         this.updatedAt = new Date(data.updatedAt);
     }

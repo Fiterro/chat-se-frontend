@@ -12,6 +12,7 @@ import { MessageData } from "../core/types/message-data.type";
 import { SessionService } from "./session.service";
 import { PaginationParams } from "../core/classes/pagination-params";
 import { ResponseListModel } from "../core/types/response-list-model.type";
+import { SocketService } from "./socket.service";
 
 @Injectable()
 export class ChatsService {
@@ -20,7 +21,9 @@ export class ChatsService {
     private activeChatId = new BehaviorSubject<number | undefined>(undefined);
 
     constructor(private readonly httpClient: HttpClient,
-                private readonly sessionService: SessionService) {
+                private readonly sessionService: SessionService,
+                private readonly socketService: SocketService) {
+        socketService.connect();
     }
 
     get chats(): Observable<Chat[]> {
@@ -72,6 +75,7 @@ export class ChatsService {
             text,
             senderId
         };
+        this.socketService.emitEvent("message", dataToSend);
         return this.httpClient
             .post<ResponseModel<any>>(`${this.API_ROOT}/messages`, dataToSend)
             .pipe(

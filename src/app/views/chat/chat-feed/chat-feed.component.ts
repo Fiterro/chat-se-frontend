@@ -1,10 +1,11 @@
-import { ChangeDetectionStrategy, Component, OnInit } from "@angular/core";
+import { ChangeDetectionStrategy, Component, ElementRef, OnInit, ViewChild } from "@angular/core";
 import { BehaviorSubject, Observable } from "rxjs";
 
 import { ChatsService } from "../../../services/chats.service";
 import { Chat } from "../../../core/classes/chat";
 import { Message } from "../../../core/classes/message";
 import { PaginationParams } from "../../../core/classes/pagination-params";
+import { map } from "rxjs/operators";
 
 @Component({
     selector: "app-chat-feed",
@@ -13,8 +14,9 @@ import { PaginationParams } from "../../../core/classes/pagination-params";
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ChatFeedComponent implements OnInit {
+    @ViewChild("feed") chatFeed: ElementRef;
     private readonly messageStorage = new BehaviorSubject<Message[]>([]);
-    private pagination: PaginationParams ;
+    private pagination: PaginationParams;
     private loadMore = true;
     private chatId: number;
 
@@ -26,7 +28,7 @@ export class ChatFeedComponent implements OnInit {
             .subscribe((chat) => {
                 this.pagination = new PaginationParams();
                 this.messageStorage.next([]);
-                this.loadChatMessages(chat.id);
+                this.loadChatMessages(chat.id, true);
                 this.loadMore = true;
                 this.chatId = chat.id;
             });
@@ -37,16 +39,23 @@ export class ChatFeedComponent implements OnInit {
     }
 
     get messages(): Observable<Message[]> {
-        return this.messageStorage.asObservable();
+        return this.messageStorage
+            .pipe(
+                map((messages) => messages.reverse())
+            );
     }
 
-    private loadChatMessages(chatId: number): void {
+    private loadChatMessages(chatId: number, firstTime = false): void {
         this.chatsService.getMessages(chatId, this.pagination)
             .subscribe(({data, pagination}) => {
+                console.log("check");
                 this.messageStorage.next([
                     ...data,
                     ...this.messageStorage.getValue()
                 ]);
+                if (firstTime) {
+                    this.scrollToBottom();
+                }
                 this.pagination.next();
 
                 if (this.messageStorage.getValue().length >= pagination.total) {
@@ -56,8 +65,15 @@ export class ChatFeedComponent implements OnInit {
     }
 
     onScroll(target: HTMLElement): void {
+        console.log("check onScroll")
         if (target.scrollTop === 0 && this.loadMore) {
             this.loadChatMessages(this.chatId);
         }
+    }
+
+    scrollToBottom(): void {
+        window.requestAnimationFrame(() => {
+            this.chatFeed.nativeElement.scrollTop = this.chatFeed.nativeElement.scrollHeight;
+        });
     }
 }

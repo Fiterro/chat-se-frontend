@@ -75,7 +75,6 @@ export class ChatsService {
             text,
             senderId
         };
-        this.socketService.emitEvent("message", dataToSend);
         return this.httpClient
             .post<ResponseModel<any>>(`${this.API_ROOT}/messages`, dataToSend)
             .pipe(

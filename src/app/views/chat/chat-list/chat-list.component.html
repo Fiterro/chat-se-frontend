@@ -1,6 +1,9 @@
 <mat-nav-list>
     <mat-list-item *ngFor="let chat of (chats | async)" (click)="selectChat(chat.id)">
-        {{chat.name}}
+        <div class="list-item">
+            {{chat.name}}
+            <button mat-flat-button="primary" (click)="$event.stopPropagation(); onActivityClick(chat)">Chat activity</button>
+        </div>
     </mat-list-item>
     <button mat-flat-button="primary" (click)="onCreateClick()">Create chat</button>
 </mat-nav-list>

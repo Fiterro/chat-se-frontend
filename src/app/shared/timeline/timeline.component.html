@@ -1,0 +1,23 @@
+<div class="timeline">
+    <ng-container *ngIf="elements.length; then timelineView else emptyView"></ng-container>
+    <ng-template #emptyView>
+        <p>No activity here</p>
+    </ng-template>
+    <ng-template #timelineView>
+        <div class="timeline__wr">
+            <div class="timeline__element" *ngFor="let element of elements">
+                <div class="timeline__timestamp">
+                    {{element.timestamp}}
+                </div>
+                <div class="timeline__participant-wr">
+                    <div class="timeline__participant"  *ngFor="let participant of element.participants">
+                        <div class="timeline__participant-avatar">
+                            <img [src]="participant.avatar" alt="Avatar">
+                        </div>
+                        <div class="timeline__participant-counter">{{participant.messageCount}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+</div>

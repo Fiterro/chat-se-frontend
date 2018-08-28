@@ -6,7 +6,7 @@ import { Observable, of } from "rxjs";
 @Component({
     selector: "app-chat-create-dialog",
     templateUrl: "./chat-create-dialog.component.html",
-    styleUrls: ["./chat-create-dialog.component.css"],
+    styleUrls: ["./chat-create-dialog.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ChatCreateDialogComponent implements OnInit {

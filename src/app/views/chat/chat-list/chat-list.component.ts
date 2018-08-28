@@ -5,6 +5,7 @@ import { MatDialog } from "@angular/material";
 import { ChatsService } from "../../../services/chats.service";
 import { Chat } from "../../../core/classes/chat";
 import { ChatCreateDialogComponent } from "../chat-create-dialog/chat-create-dialog.component";
+import { ChatActivityComponent } from "../chat-activity/chat-activity.component";
 
 @Component({
     selector: "app-chat-list",
@@ -35,5 +36,10 @@ export class ChatListComponent {
                     this.chatsService.createChat(result).subscribe();
                 }
         });
+    }
+
+    onActivityClick(chat: Chat) {
+        const dialogRef = this.matDialog.open(ChatActivityComponent, {hasBackdrop: true, disableClose: false});
+        dialogRef.componentInstance.chat = chat;
     }
 }

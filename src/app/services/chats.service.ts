@@ -13,6 +13,7 @@ import { SessionService } from "./session.service";
 import { PaginationParams } from "../core/classes/pagination-params";
 import { ResponseListModel } from "../core/types/response-list-model.type";
 import { SocketService } from "./socket.service";
+import { TimelineItem } from "../core/classes/timeline-item.class";
 
 @Injectable()
 export class ChatsService {
@@ -94,6 +95,15 @@ export class ChatsService {
                         pagination: response.pagination
                     };
                 })
+            );
+    }
+
+    getChatActivity(chatId?: number): Observable<TimelineItem[]> {
+        const id = chatId ? chatId : this.activeChatId.getValue();
+        return this.httpClient
+            .get<ResponseModel<any>>(`${this.API_ROOT}/${id}/activity`)
+            .pipe(
+                map(({data}) => data.map((item) => new TimelineItem(item)))
             );
     }
 

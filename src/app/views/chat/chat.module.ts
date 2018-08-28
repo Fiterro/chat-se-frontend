@@ -10,6 +10,8 @@ import { ChatListComponent } from "./chat-list/chat-list.component";
 import { ChatMessageComponent } from "./chat-message/chat-message.component";
 import { CapitalizeFirstModule } from "../../shared/pipes/capitalize-first/capitalize-first.module";
 import { ChatCreateDialogComponent } from "./chat-create-dialog/chat-create-dialog.component";
+import { ChatActivityComponent } from "./chat-activity/chat-activity.component";
+import { TimelineModule } from "../../shared/timeline/timeline.module";
 
 @NgModule({
     imports: [
@@ -23,7 +25,8 @@ import { ChatCreateDialogComponent } from "./chat-create-dialog/chat-create-dial
         MatIconModule,
         MatButtonModule,
         CapitalizeFirstModule,
-        MatDialogModule
+        MatDialogModule,
+        TimelineModule
     ],
     declarations: [
         ChatMainComponent,
@@ -31,10 +34,12 @@ import { ChatCreateDialogComponent } from "./chat-create-dialog/chat-create-dial
         ChatInputComponent,
         ChatListComponent,
         ChatMessageComponent,
-        ChatCreateDialogComponent
+        ChatCreateDialogComponent,
+        ChatActivityComponent
     ],
     entryComponents: [
-        ChatCreateDialogComponent
+        ChatCreateDialogComponent,
+        ChatActivityComponent
     ],
     exports: [
         ChatMainComponent,

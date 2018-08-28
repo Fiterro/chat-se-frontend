@@ -5,7 +5,6 @@ import { ChatsService } from "../../../services/chats.service";
 import { Chat } from "../../../core/classes/chat";
 import { Message } from "../../../core/classes/message";
 import { PaginationParams } from "../../../core/classes/pagination-params";
-import { map } from "rxjs/operators";
 
 @Component({
     selector: "app-chat-feed",
@@ -17,7 +16,7 @@ export class ChatFeedComponent implements OnInit {
     @ViewChild("feed") chatFeed: ElementRef;
     private readonly messageStorage = new BehaviorSubject<Message[]>([]);
     private pagination: PaginationParams;
-    private loadMore = true;
+    private loadMore = false;
     private chatId: number;
 
     constructor(private readonly chatsService: ChatsService) {
@@ -29,7 +28,6 @@ export class ChatFeedComponent implements OnInit {
                 this.pagination = new PaginationParams();
                 this.messageStorage.next([]);
                 this.loadChatMessages(chat.id, true);
-                this.loadMore = true;
                 this.chatId = chat.id;
             });
     }
@@ -39,18 +37,14 @@ export class ChatFeedComponent implements OnInit {
     }
 
     get messages(): Observable<Message[]> {
-        return this.messageStorage
-            .pipe(
-                map((messages) => messages.reverse())
-            );
+        return this.messageStorage.asObservable();
     }
 
     private loadChatMessages(chatId: number, firstTime = false): void {
         this.chatsService.getMessages(chatId, this.pagination)
             .subscribe(({data, pagination}) => {
-                console.log("check");
                 this.messageStorage.next([
-                    ...data,
+                    ...data.reverse(),
                     ...this.messageStorage.getValue()
                 ]);
                 if (firstTime) {
@@ -58,14 +52,13 @@ export class ChatFeedComponent implements OnInit {
                 }
                 this.pagination.next();
 
-                if (this.messageStorage.getValue().length >= pagination.total) {
-                    this.loadMore = false;
+                if (this.messageStorage.getValue().length < pagination.total) {
+                    this.loadMore = true;
                 }
             });
     }
 
     onScroll(target: HTMLElement): void {
-        console.log("check onScroll")
         if (target.scrollTop === 0 && this.loadMore) {
             this.loadChatMessages(this.chatId);
         }

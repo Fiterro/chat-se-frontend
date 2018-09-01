@@ -11,6 +11,7 @@
     <div id="content">
         <mat-sidenav-container>
             <mat-sidenav class="db__sidenav" #snav [mode]="mobileQuery.matches ? 'over' : 'side'"
+                         [opened]="sidebarDefaultOpened"
                          [fixedInViewport]="mobileQuery.matches">
                 <app-chat-list></app-chat-list>
             </mat-sidenav>

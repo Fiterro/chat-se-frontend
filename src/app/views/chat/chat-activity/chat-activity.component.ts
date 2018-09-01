@@ -15,7 +15,7 @@ import { TimelineItem } from "../../../core/classes/timeline-item.class";
 export class ChatActivityComponent implements OnInit {
     @Input() chat: Chat;
 
-    readonly elements = new BehaviorSubject<TimelineItem>([]);
+    readonly elements = new BehaviorSubject<TimelineItem[]>([]);
 
     constructor(private readonly matDialogRef: MatDialogRef<ChatActivityComponent>,
                 private readonly chatsService: ChatsService) {

@@ -3,6 +3,7 @@
     flex-direction: row;
     align-items: center;
     padding: 20px;
+    height: 200px;
 
     &__wr {
         display: flex;
@@ -10,8 +11,11 @@
     }
 
     &__element {
+        display: flex;
+        flex: 0 0 100px;
         position: relative;
-        width: 100px;
+        height: 30px;
+        border-top: 3px solid black;
 
         &:hover {
             .timeline__timestamp {
@@ -30,7 +34,7 @@
 
         &-wr {
             position: absolute;
-            top: 0;
+            top: 100%;
             left: 0;
         }
 

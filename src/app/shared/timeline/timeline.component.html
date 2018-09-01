@@ -5,7 +5,7 @@
     </ng-template>
     <ng-template #timelineView>
         <div class="timeline__wr">
-            <div class="timeline__element" *ngFor="let element of elements">
+            <div class="timeline__element" *ngFor="let element of activityArr">
                 <div class="timeline__timestamp">
                     {{element.timestamp}}
                 </div>
@@ -14,7 +14,7 @@
                         <div class="timeline__participant-avatar">
                             <img [src]="participant.avatar" alt="Avatar">
                         </div>
-                        <div class="timeline__participant-counter">{{participant.messageCount}}</div>
+                        <div class="timeline__participant-counter">{{participant.messageCount}} messages</div>
                     </div>
                 </div>
             </div>

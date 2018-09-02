@@ -26,4 +26,7 @@ export class ChatActivityComponent implements OnInit {
             .subscribe((chatInfo) => this.elements.next(chatInfo));
     }
 
+    onCloseClick(): void {
+        this.matDialogRef.close();
+    }
 }

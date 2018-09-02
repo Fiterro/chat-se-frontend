@@ -20,6 +20,10 @@ export class TimelineComponent implements OnChanges {
         this.now = moment();
     }
 
+    get timeline(): TimelineElem[] {
+        return this.activityArr.reverse();
+    }
+
     ngOnChanges({elements}: SimpleChanges): void {
         if (elements && elements.currentValue && elements.currentValue.length) {
             this.formActivityLine(elements.currentValue);

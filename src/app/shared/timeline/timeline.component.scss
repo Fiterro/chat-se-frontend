@@ -1,47 +1,90 @@
+$timeline-primary-color: black;
+$timeline-width: 2px;
+$marker-size: 6px;
+$avatar-size: 50px;
+
 .timeline {
     display: flex;
     flex-direction: row;
     align-items: center;
-    padding: 20px;
     height: 200px;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
 
     &__wr {
         display: flex;
         width: 100%;
+        padding: 10px 20px 20px;
     }
 
     &__element {
         display: flex;
-        flex: 0 0 100px;
+        flex: 0 0 120px;
+        width: 120px;
         position: relative;
         height: 30px;
-        border-top: 3px solid black;
+        border-top: $timeline-width solid $timeline-primary-color;
+
+        &.empty {
+
+            &:before {
+                display: none;
+            }
+        }
+
+        &:before {
+            content: '';
+            display: flex;
+            position: absolute;
+            top: -($marker-size + $timeline-width)/2;
+            left: 0;
+            width: $marker-size;
+            height: $marker-size;
+            border-radius: 50%;
+            background: $timeline-primary-color;
+        }
 
         &:hover {
+
             .timeline__timestamp {
                 display: none;
             }
 
             .timeline__participant {
-                display: flex;
+
+                &-wr {
+                    border: 1px solid $timeline-primary-color;
+                    padding: 5px;
+                    max-height: 200px;
+                    transition: max-height ease 500ms;
+                    overflow-y: auto;
+                }
             }
         }
     }
 
     &__participant {
-        display: none;
+        display: flex;
         flex-direction: column;
+        justify-content: center;
+        align-items: center;
 
         &-wr {
             position: absolute;
-            top: 100%;
+            top: 0;
             left: 0;
+            margin: $marker-size;
+            border-radius: 5px;
+            max-height: 0;
+            height: $avatar-size + 15px;
+            overflow: hidden;
         }
 
         &-avatar {
-            width: 50px;
-            height: 50px;
-            overflow: hidden;
+            display: flex;
+            width: $avatar-size;
+            height: $avatar-size;
             border-radius: 50%;
             border: 1px solid black;
 
@@ -52,5 +95,10 @@
                 max-height: 100%;
             }
         }
+    }
+
+    .timeline__timestamp {
+        font-size: 12px;
+        padding: 5px;
     }
 }

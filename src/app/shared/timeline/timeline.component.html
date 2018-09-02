@@ -5,12 +5,13 @@
     </ng-template>
     <ng-template #timelineView>
         <div class="timeline__wr">
-            <div class="timeline__element" *ngFor="let element of activityArr">
+            <div class="timeline__element" *ngFor="let element of timeline"
+                 [class.empty]="!element.participants || !element.participants.length">
                 <div class="timeline__timestamp">
                     {{element.timestamp}}
                 </div>
-                <div class="timeline__participant-wr">
-                    <div class="timeline__participant"  *ngFor="let participant of element.participants">
+                <div class="timeline__participant-wr" *ngIf="element.participants && element.participants.length">
+                    <div class="timeline__participant" *ngFor="let participant of element.participants">
                         <div class="timeline__participant-avatar">
                             <img [src]="participant.avatar" alt="Avatar">
                         </div>

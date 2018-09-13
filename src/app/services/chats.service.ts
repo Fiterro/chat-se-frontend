@@ -68,7 +68,7 @@ export class ChatsService {
             );
     }
 
-    sendMessage(text: string): Observable<any> {
+    sendMessage(text: string): void{
         const chatId = this.activeChatId.getValue();
         const senderId = this.sessionService.userSnapshot.id;
         const dataToSend = {
@@ -76,11 +76,8 @@ export class ChatsService {
             text,
             senderId
         };
-        return this.httpClient
-            .post<ResponseModel<any>>(`${this.API_ROOT}/messages`, dataToSend)
-            .pipe(
-                map(({data}) => data)
-            );
+        return this.socketService
+            .emitEvent("createMessage", dataToSend);
     }
 
     getMessages(chatId?: number, params?: PaginationParams): Observable<{data: Message[], pagination: { total: number }}> {

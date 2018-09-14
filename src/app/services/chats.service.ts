@@ -14,6 +14,7 @@ import { PaginationParams } from "../core/classes/pagination-params";
 import { ResponseListModel } from "../core/types/response-list-model.type";
 import { SocketService } from "./socket.service";
 import { TimelineItem } from "../core/classes/timeline-item.class";
+import { SocketEvents } from "../core/enums/socket-events.enum";
 
 @Injectable()
 export class ChatsService {
@@ -54,6 +55,14 @@ export class ChatsService {
             );
     }
 
+    get newMessage(): Observable<Message> {
+        return this.socketService.newMessage
+            .pipe(
+                tap((message) => console.log(message)),
+                map((messageData: MessageData) => new Message(messageData))
+            );
+    }
+
     selectChat(chatId: number): void {
         if (chatId && chatId !== this.activeChatId.getValue()) {
             this.activeChatId.next(chatId);
@@ -68,7 +77,7 @@ export class ChatsService {
             );
     }
 
-    sendMessage(text: string): void{
+    sendMessage(text: string): void {
         const chatId = this.activeChatId.getValue();
         const senderId = this.sessionService.userSnapshot.id;
         const dataToSend = {
@@ -77,10 +86,10 @@ export class ChatsService {
             senderId
         };
         return this.socketService
-            .emitEvent("createMessage", dataToSend);
+            .emitEvent(SocketEvents.CreateMessage, dataToSend);
     }
 
-    getMessages(chatId?: number, params?: PaginationParams): Observable<{data: Message[], pagination: { total: number }}> {
+    getMessages(chatId?: number, params?: PaginationParams): Observable<{ data: Message[], pagination: { total: number } }> {
         const id = chatId ? chatId : this.activeChatId.getValue();
         const paramsToSend = params ? params.toHttpParams() : new PaginationParams().toHttpParams();
         return this.httpClient

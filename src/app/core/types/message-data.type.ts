@@ -1,10 +1,8 @@
 export type MessageData = Readonly<{
     id: number,
     chatId: number,
-    senderId: number,
-    sender: any,
     text: string,
-    status: number,
+    sender: any,
     viewCount: number,
     sentAt: string,
     createdAt: string,

@@ -1,10 +1,12 @@
 import { ChangeDetectionStrategy, Component, ElementRef, OnInit, ViewChild } from "@angular/core";
 import { BehaviorSubject, Observable } from "rxjs";
+import { filter, map, merge, share, startWith, switchMap, tap, throttleTime } from "rxjs/operators";
 
 import { ChatsService } from "../../../services/chats.service";
 import { Chat } from "../../../core/classes/chat";
 import { Message } from "../../../core/classes/message";
 import { PaginationParams } from "../../../core/classes/pagination-params";
+import { BorderScrolledDirective } from "../../../shared/border-scrolled/border-scrolled.directive";
 
 @Component({
     selector: "app-chat-feed",
@@ -13,60 +15,109 @@ import { PaginationParams } from "../../../core/classes/pagination-params";
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ChatFeedComponent implements OnInit {
-    @ViewChild("feed") chatFeed: ElementRef;
-    private readonly messageStorage = new BehaviorSubject<Message[]>([]);
+    messages: Observable<Message[]>;
+    @ViewChild("feed")
+    private readonly chatFeed: ElementRef;
+    @ViewChild(BorderScrolledDirective)
+    private readonly borderScrolled: BorderScrolledDirective;
+    private readonly chatHistory = new BehaviorSubject<Message[]>([]);
+    private innerMessages: Message[] = [];
     private pagination: PaginationParams;
     private loadMore = false;
+    private inProgress = false;
     private chatId: number;
+    private firstTimeLoad = true;
 
     constructor(private readonly chatsService: ChatsService) {
     }
 
-    ngOnInit(): void {
-        this.activeChat
-            .subscribe((chat) => {
-                this.pagination = new PaginationParams();
-                this.messageStorage.next([]);
-                this.loadChatMessages(chat.id, true);
-                this.chatId = chat.id;
-            });
-    }
-
-    get activeChat(): Observable<Chat> {
+    private get activeChat(): Observable<Chat> {
         return this.chatsService.activeChat;
     }
 
-    get messages(): Observable<Message[]> {
-        return this.messageStorage.asObservable();
+    private get newMessage(): Observable<Message[]> {
+        return this.chatsService.newMessage
+            .pipe(
+                filter((message) => message.chatId === this.chatId),
+                tap(() => this.scrollToBottom()),
+                map((message) => [message]),
+                share()
+            );
     }
 
-    private loadChatMessages(chatId: number, firstTime = false): void {
-        this.chatsService.getMessages(chatId, this.pagination)
-            .subscribe(({data, pagination}) => {
-                this.messageStorage.next([
-                    ...data.reverse(),
-                    ...this.messageStorage.getValue()
-                ]);
-                if (firstTime) {
-                    this.scrollToBottom();
-                }
-                this.pagination.next();
+    ngOnInit(): void {
+        const THROTTLE_EVENTS_TIME = 500;
+        this.initChat();
+        this.createMessageObservable();
 
-                if (this.messageStorage.getValue().length < pagination.total) {
-                    this.loadMore = true;
-                }
-            });
-    }
-
-    onScroll(target: HTMLElement): void {
-        if (target.scrollTop === 0 && this.loadMore) {
-            this.loadChatMessages(this.chatId);
-        }
+        this.borderScrolled.appBorderScrolled
+            .pipe(
+                filter(() => !this.inProgress),
+                throttleTime(THROTTLE_EVENTS_TIME)
+            )
+            .subscribe(() => this.loadChatMessages(this.chatId));
     }
 
     scrollToBottom(): void {
         window.requestAnimationFrame(() => {
             this.chatFeed.nativeElement.scrollTop = this.chatFeed.nativeElement.scrollHeight;
         });
+    }
+
+    private initChat(): void {
+        this.activeChat
+            .subscribe((chat) => {
+                this.pagination = new PaginationParams();
+                this.chatHistory.next([]);
+                this.innerMessages = [];
+                this.firstTimeLoad = true;
+                this.loadMore = true;
+                this.chatId = chat.id;
+                this.loadChatMessages(this.chatId, this.firstTimeLoad);
+            });
+    }
+
+    private createMessageObservable(): void {
+        this.messages = this.chatHistory
+            .pipe(
+                merge(this.newMessage),
+                map((messages) => {
+                    console.log("add new message data");
+                    // TODO: sort data
+                    this.innerMessages = this.innerMessages
+                        .concat(messages);
+                    return this.innerMessages;
+                }),
+                share()
+            );
+    }
+
+    private loadChatMessages(chatId: number, firstTime = false): void {
+        if (!this.loadMore) {
+            return;
+        }
+        this.inProgress = true;
+        this.chatsService.getMessages(chatId, this.pagination)
+            .subscribe(({data, pagination}) => {
+                this.addMessagesToHistory(data.reverse());
+                if (firstTime) {
+                    this.scrollToBottom();
+                }
+                this.firstTimeLoad = false;
+                this.pagination.next();
+
+                console.log("inner messages: ", this.innerMessages.length);
+                console.log("TOTAL: ", pagination.total);
+                console.log(this.innerMessages);
+
+                this.loadMore = this.innerMessages.length < pagination.total;
+                this.inProgress = false;
+            });
+    }
+
+    private addMessagesToHistory(chatMessages: Message[]): void {
+        console.log("append new messages portion")
+        const oldMessages = this.chatHistory.getValue();
+        this.chatHistory.next([...chatMessages, ...oldMessages]);
     }
 }

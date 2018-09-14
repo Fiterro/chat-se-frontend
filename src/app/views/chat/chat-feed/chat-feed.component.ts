@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, ElementRef, OnInit, ViewChild } from "@angular/core";
-import { BehaviorSubject, Observable } from "rxjs";
-import { filter, map, merge, share, startWith, switchMap, tap, throttleTime } from "rxjs/operators";
+import { BehaviorSubject, combineLatest, Observable, of } from "rxjs";
+import { filter, map, merge, share, tap, throttleTime } from "rxjs/operators";
 
 import { ChatsService } from "../../../services/chats.service";
 import { Chat } from "../../../core/classes/chat";
@@ -21,6 +21,7 @@ export class ChatFeedComponent implements OnInit {
     @ViewChild(BorderScrolledDirective)
     private readonly borderScrolled: BorderScrolledDirective;
     private readonly chatHistory = new BehaviorSubject<Message[]>([]);
+    private readonly messagesCached = new BehaviorSubject<Message[]>([]);
     private innerMessages: Message[] = [];
     private pagination: PaginationParams;
     private loadMore = false;
@@ -29,6 +30,13 @@ export class ChatFeedComponent implements OnInit {
     private firstTimeLoad = true;
 
     constructor(private readonly chatsService: ChatsService) {
+    }
+
+    get noMessages(): Observable<boolean> {
+        return of(this.innerMessages)
+            .pipe(
+                map((messages) => !messages.length)
+            );
     }
 
     private get activeChat(): Observable<Chat> {
@@ -40,8 +48,7 @@ export class ChatFeedComponent implements OnInit {
             .pipe(
                 filter((message) => message.chatId === this.chatId),
                 tap(() => this.scrollToBottom()),
-                map((message) => [message]),
-                share()
+                map((message) => [message])
             );
     }
 
@@ -69,6 +76,7 @@ export class ChatFeedComponent implements OnInit {
             .subscribe((chat) => {
                 this.pagination = new PaginationParams();
                 this.chatHistory.next([]);
+                this.messagesCached.next([]);
                 this.innerMessages = [];
                 this.firstTimeLoad = true;
                 this.loadMore = true;
@@ -78,16 +86,22 @@ export class ChatFeedComponent implements OnInit {
     }
 
     private createMessageObservable(): void {
-        this.messages = this.chatHistory
+        this.messages = combineLatest(this.chatHistory, this.messagesCached)
             .pipe(
-                merge(this.newMessage),
+                map(([history, cache]) => history.concat(cache)),
                 map((messages) => {
-                    console.log("add new message data");
                     // TODO: sort data
-                    this.innerMessages = this.innerMessages
-                        .concat(messages);
+                    this.innerMessages = messages;
                     return this.innerMessages;
                 }),
+                merge(this.newMessage.pipe(
+                    map((sent) => {
+                        // TODO: filter for already in chat messages
+                        this.cacheMessages(sent);
+
+                        return this.innerMessages;
+                    })
+                )),
                 share()
             );
     }
@@ -97,6 +111,7 @@ export class ChatFeedComponent implements OnInit {
             return;
         }
         this.inProgress = true;
+        this.pagination.setOffset(this.innerMessages.length);
         this.chatsService.getMessages(chatId, this.pagination)
             .subscribe(({data, pagination}) => {
                 this.addMessagesToHistory(data.reverse());
@@ -104,20 +119,18 @@ export class ChatFeedComponent implements OnInit {
                     this.scrollToBottom();
                 }
                 this.firstTimeLoad = false;
-                this.pagination.next();
-
-                console.log("inner messages: ", this.innerMessages.length);
-                console.log("TOTAL: ", pagination.total);
-                console.log(this.innerMessages);
-
                 this.loadMore = this.innerMessages.length < pagination.total;
                 this.inProgress = false;
             });
     }
 
     private addMessagesToHistory(chatMessages: Message[]): void {
-        console.log("append new messages portion")
         const oldMessages = this.chatHistory.getValue();
         this.chatHistory.next([...chatMessages, ...oldMessages]);
+    }
+
+    private cacheMessages(chatMessages: Message[]): void {
+        const messagesCached = this.messagesCached.getValue();
+        this.messagesCached.next([...messagesCached, ...chatMessages]);
     }
 }

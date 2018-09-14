@@ -58,7 +58,6 @@ export class ChatsService {
     get newMessage(): Observable<Message> {
         return this.socketService.newMessage
             .pipe(
-                tap((message) => console.log(message)),
                 map((messageData: MessageData) => new Message(messageData))
             );
     }

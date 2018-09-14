@@ -14,6 +14,10 @@ export class PaginationParams {
         }
     }
 
+    setOffset(param: number): void {
+        this.offset = param;
+    }
+
     next(): void {
         this.offset = this.offset + this.limit;
     }

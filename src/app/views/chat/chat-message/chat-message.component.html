@@ -15,6 +15,7 @@
         <div class="chat__message-text">{{message.sender.firstName}} {{message.sender.lastName}}</div>
         <div class="chat__message-text">{{message.text}}</div>
         <div class="chat__message-date">{{message.sentAt | date:'short'}}</div>
+        <div class="chat__message-date">{{message.status | async}}</div>
     </div>
     <mat-divider class="chat__message-divider"></mat-divider>
 </div>

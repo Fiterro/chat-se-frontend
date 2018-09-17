@@ -12,6 +12,7 @@ import { CapitalizeFirstModule } from "../../shared/pipes/capitalize-first/capit
 import { ChatCreateDialogComponent } from "./chat-create-dialog/chat-create-dialog.component";
 import { ChatActivityComponent } from "./chat-activity/chat-activity.component";
 import { TimelineModule } from "../../shared/timeline/timeline.module";
+import { BorderScrolledModule } from "../../shared/border-scrolled/border-scrolled.module";
 
 @NgModule({
     imports: [
@@ -26,7 +27,8 @@ import { TimelineModule } from "../../shared/timeline/timeline.module";
         MatButtonModule,
         CapitalizeFirstModule,
         MatDialogModule,
-        TimelineModule
+        TimelineModule,
+        BorderScrolledModule
     ],
     declarations: [
         ChatMainComponent,

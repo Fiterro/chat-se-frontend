@@ -1,12 +1,11 @@
+import { UserShort } from "./user-short.type";
+
 export type MessageData = Readonly<{
-    id: number,
     chatId: number,
-    senderId: number,
-    sender: any,
     text: string,
-    status: number,
-    viewCount: number,
-    sentAt: string,
-    createdAt: string,
-    updatedAt: string
+    sender: UserShort,
+    id?: number,
+    viewCount?: number,
+    uuid?: string,
+    sentAt?: string
 }>;

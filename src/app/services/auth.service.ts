@@ -30,7 +30,9 @@ export class AuthService {
     signinGoogleCallback(code): Observable<boolean> {
         return this.httpClient.post<ResponseModel<User>>(`${this.API_ROOT}/google/callback`, {code})
             .pipe(
-                map(({data}) => this.processLogin(data))
+                map(({data}) => {
+                    return this.processLogin(data);
+                })
             );
     }
 

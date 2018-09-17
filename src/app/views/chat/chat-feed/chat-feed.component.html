@@ -1,7 +1,6 @@
-<div #feed class="chat__feed-container" *ngIf="activeChat | async" (scroll)="onScroll($event.target)">
-    <div *ngIf="(messages | async).length; then messagesList else noMessages"></div>
-    <ng-template #messagesList>
-        <app-chat-message  *ngFor="let message of (messages | async)" [message]="message"></app-chat-message>
-    </ng-template>
-    <ng-template #noMessages></ng-template>
+<div #feed class="chat__feed-container" appBorderScrolled #borderScrolled [gap]="400">
+    <app-chat-message *ngFor="let message of (messages | async)" [message]="message"></app-chat-message>
+    <div *ngIf="noMessages | async">
+        <p>Start with your nice message</p>
+    </div>
 </div>

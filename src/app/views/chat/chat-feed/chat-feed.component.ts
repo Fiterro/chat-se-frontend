@@ -47,6 +47,13 @@ export class ChatFeedComponent implements OnInit {
         return this.chatsService.newMessage
             .pipe(
                 filter((message) => message.chatId === this.chatId),
+                filter((message) => {
+                    const existingMessageIndex = this.innerMessages.findIndex((innerMsg) => innerMsg.uuid === message.uuid);
+                    if (existingMessageIndex >= 0) {
+                        this.innerMessages[existingMessageIndex].setStatus(message.viewCount);
+                    }
+                    return existingMessageIndex < 0;
+                }),
                 tap(() => this.scrollToBottom()),
                 map((message) => [message])
             );
@@ -94,9 +101,16 @@ export class ChatFeedComponent implements OnInit {
                     this.innerMessages = messages;
                     return this.innerMessages;
                 }),
+                merge(this.chatsService.messageSent.pipe(
+                    map((sent) => {
+                        this.cacheMessages([sent]);
+
+                        return this.innerMessages;
+                    }),
+                    tap(() => this.scrollToBottom())
+                )),
                 merge(this.newMessage.pipe(
                     map((sent) => {
-                        // TODO: filter for already in chat messages
                         this.cacheMessages(sent);
 
                         return this.innerMessages;

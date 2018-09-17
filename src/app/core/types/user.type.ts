@@ -1,4 +1,7 @@
-export type UserData = {
-    id: number,
-    token: string
-};
+import { UserShort } from "./user-short.type";
+
+export type UserData = Readonly<{
+    token: string,
+    email: string,
+    profile: UserShort
+}>;

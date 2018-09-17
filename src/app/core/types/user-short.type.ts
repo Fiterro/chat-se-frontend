@@ -4,5 +4,6 @@ export type UserShort = {
     email: string,
     firstName: string,
     lastName: string,
-    avatar: string
+    avatar: string,
+    googleId: string;
 };

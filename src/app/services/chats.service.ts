@@ -1,7 +1,9 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
-import { BehaviorSubject, Observable } from "rxjs";
+import { BehaviorSubject, Observable, Subject } from "rxjs";
 import { filter, map, share, tap } from "rxjs/operators";
+
+import { v4 as uuidv4 } from "uuid";
 
 import { API_ROOT_CHAT } from "../app.constants";
 import { ResponseModel } from "../core/types/response-model.type";
@@ -15,9 +17,12 @@ import { ResponseListModel } from "../core/types/response-list-model.type";
 import { SocketService } from "./socket.service";
 import { TimelineItem } from "../core/classes/timeline-item.class";
 import { SocketEvents } from "../core/enums/socket-events.enum";
+import { MessageToSend } from "../core/types/message-to-send.type";
 
 @Injectable()
 export class ChatsService {
+    readonly messageSent = new Subject<Message>();
+
     private readonly API_ROOT = API_ROOT_CHAT;
     private chatsList = new BehaviorSubject<Chat[] | undefined>(undefined);
     private activeChatId = new BehaviorSubject<number | undefined>(undefined);
@@ -58,7 +63,9 @@ export class ChatsService {
     get newMessage(): Observable<Message> {
         return this.socketService.newMessage
             .pipe(
-                map((messageData: MessageData) => new Message(messageData))
+                map((messageData: MessageData) => {
+                    return new Message(messageData);
+                })
             );
     }
 
@@ -78,12 +85,23 @@ export class ChatsService {
 
     sendMessage(text: string): void {
         const chatId = this.activeChatId.getValue();
-        const senderId = this.sessionService.userSnapshot.id;
-        const dataToSend = {
+        const senderId = this.sessionService.userSnapshot.profile.id;
+        // Prepare data to send through sockets
+        const dataToSend: MessageToSend = {
             chatId,
             text,
-            senderId
+            senderId,
+            uuid: uuidv4()
         };
+        // Create message and store in feed
+        const message = new Message({
+            chatId,
+            text,
+            sender: this.sessionService.userSnapshot.profile,
+            uuid: dataToSend.uuid
+        });
+        this.messageSent.next(message);
+
         return this.socketService
             .emitEvent(SocketEvents.CreateMessage, dataToSend);
     }

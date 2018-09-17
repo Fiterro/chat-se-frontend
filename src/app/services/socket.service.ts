@@ -35,7 +35,6 @@ export class SocketService {
     private initEventListeners(): void {
         this.socket
             .on(SocketEvents.Message, (data: MessageData) => {
-                console.log("\"message\" event");
                 this.newMessage.next(data);
             });
     }

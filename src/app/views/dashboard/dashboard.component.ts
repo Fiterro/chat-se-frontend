@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy } from "@angular/core";
 import { MediaMatcher } from "@angular/cdk/layout";
+
 import { AuthService } from "../../services/auth.service";
 
 @Component({
@@ -12,7 +13,7 @@ export class DashboardComponent implements OnDestroy {
     mobileQuery: MediaQueryList;
     readonly sidebarDefaultOpened = true;
 
-    private _mobileQueryListener: () => void;
+    private readonly _mobileQueryListener: () => void;
 
     constructor(private readonly changeDetectorRef: ChangeDetectorRef,
                 private readonly authService: AuthService,

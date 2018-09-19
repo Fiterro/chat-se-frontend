@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, ElementRef, OnInit, ViewChild } from "@angular/core";
 import { BehaviorSubject, combineLatest, Observable, of } from "rxjs";
-import { filter, map, merge, share, tap, throttleTime } from "rxjs/operators";
+import { filter, map, merge, share, switchMap, tap, throttleTime } from "rxjs/operators";
 
 import { ChatsService } from "../../../services/chats.service";
 import { Chat } from "../../../core/classes/chat";
@@ -127,14 +127,20 @@ export class ChatFeedComponent implements OnInit {
         this.inProgress = true;
         this.pagination.setOffset(this.innerMessages.length);
         this.chatsService.getMessages(chatId, this.pagination)
-            .subscribe(({data, pagination}) => {
-                this.addMessagesToHistory(data.reverse());
-                if (firstTime) {
-                    this.scrollToBottom();
-                }
-                this.firstTimeLoad = false;
-                this.loadMore = this.innerMessages.length < pagination.total;
-                this.inProgress = false;
+            .pipe(
+                switchMap(({data, pagination}) => {
+                    this.addMessagesToHistory(data.reverse());
+                    if (firstTime) {
+                        this.scrollToBottom();
+                    }
+                    this.firstTimeLoad = false;
+                    this.loadMore = this.innerMessages.length < pagination.total;
+                    this.inProgress = false;
+                    return this.chatsService.readMessages(this.chatId, data.map((message) => message.id));
+                })
+            )
+            .subscribe((messageCounter) => {
+                // TODO: update messages viewCounters
             });
     }
 

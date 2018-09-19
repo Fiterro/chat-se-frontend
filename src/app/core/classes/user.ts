@@ -6,7 +6,6 @@ export class User {
     readonly session: any;
 
     constructor(user: UserData) {
-        console.log(user);
         this.profile = user.profile;
         this.session = user.session;
     }

@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Router } from "@angular/router";
 import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
+import { map, tap } from "rxjs/operators";
 
 import { API_ROOT_AUTH } from "../app.constants";
 import { ResponseModel } from "../core/types/response-model.type";
@@ -36,9 +36,10 @@ export class AuthService {
             );
     }
 
-    logout() {
-        this.sessionService.set(undefined);
-        this.router.navigate(["/auth"]);
+    logout(): void {
+        this.httpClient.delete<ResponseModel<void>>(`${this.API_ROOT}/logout`)
+            .pipe(tap(() => this.sessionService.set(undefined)))
+            .subscribe(() => this.router.navigate(["/auth"]));
     }
 
     private processLogin(user: User): boolean {

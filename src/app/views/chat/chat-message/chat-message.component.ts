@@ -1,6 +1,8 @@
-import { ChangeDetectionStrategy, Component, Input } from "@angular/core";
+import { ChangeDetectionStrategy, Component, HostListener, Input } from "@angular/core";
+import { BehaviorSubject } from "rxjs";
 
 import { Message } from "../../../core/classes/message";
+import { FlipState } from "../../../animations/flip-card.animation";
 
 @Component({
     selector: "app-chat-message",
@@ -9,5 +11,16 @@ import { Message } from "../../../core/classes/message";
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ChatMessageComponent {
+    readonly flipped = new BehaviorSubject<FlipState>(FlipState.Unflipped);
     @Input() message: Message;
+
+    @HostListener("mouseenter")
+    @HostListener("mouseleave")
+    onHover(): void {
+        this.flip();
+    }
+
+    private flip(): void {
+        this.flipped.next(this.flipped.value === FlipState.Unflipped ? FlipState.Flipped : FlipState.Unflipped);
+    }
 }

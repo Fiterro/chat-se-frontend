@@ -27,7 +27,7 @@ export class AuthService {
             );
     }
 
-    signinGoogleCallback(code): Observable<boolean> {
+    signinGoogleCallback(code: string): Observable<boolean> {
         return this.httpClient.post<ResponseModel<User>>(`${this.API_ROOT}/google/callback`, {code})
             .pipe(
                 map(({data}) => {
@@ -38,7 +38,9 @@ export class AuthService {
 
     logout(): void {
         this.httpClient.delete<ResponseModel<void>>(`${this.API_ROOT}/logout`)
-            .pipe(tap(() => this.sessionService.set(undefined)))
+            .pipe(
+                tap(() => this.sessionService.set(undefined))
+            )
             .subscribe(() => this.router.navigate(["/auth"]));
     }
 

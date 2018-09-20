@@ -82,9 +82,9 @@ export class ChatsService {
     }
 
     createChat(name: string): Observable<Chat> {
-        return this.httpClient.post<ResponseModel<Chat>>(`${this.API_ROOT}`, {name})
+        return this.httpClient.post<ResponseModel<ChatData>>(`${this.API_ROOT}`, {name})
             .pipe(
-                map(({data}) => data),
+                map(({data}) => new Chat(data)),
                 tap((chat: Chat) => this.chatsList.next([...this.chatsList.getValue(), chat]))
             );
     }

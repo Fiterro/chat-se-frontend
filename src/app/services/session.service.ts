@@ -9,9 +9,10 @@ import { UserData } from "../core/types/user.type";
     providedIn: "root"
 })
 export class SessionService {
+    readonly isAdmin = new BehaviorSubject<boolean | undefined>(undefined);
 
-    private readonly innerUser = new BehaviorSubject<User | undefined>(undefined);
     private readonly userStorage = new AppStorage<UserData>(localStorage, "user");
+    private readonly innerUser = new BehaviorSubject<User | undefined>(undefined);
 
     constructor() {
         const user = this.userStorage.getItem();
@@ -23,6 +24,7 @@ export class SessionService {
         this.user
             .subscribe((u) => {
                 if (!u) {
+                    this.isAdmin.next(undefined);
                     this.userStorage.removeItem();
                 } else {
                     this.userStorage.setItem(u);

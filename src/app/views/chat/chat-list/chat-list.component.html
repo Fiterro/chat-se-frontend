@@ -5,5 +5,5 @@
             <button mat-flat-button="primary" (click)="$event.stopPropagation(); onActivityClick(chat)">Chat activity</button>
         </div>
     </mat-list-item>
-    <button mat-flat-button="primary" (click)="onCreateClick()">Create chat</button>
+    <button mat-flat-button="primary" (click)="onCreateClick()" *ngIf="isAdmin | async">Create chat</button>
 </mat-nav-list>

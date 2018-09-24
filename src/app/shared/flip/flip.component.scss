@@ -3,6 +3,7 @@
     width: 100%;
     perspective: 10000px;
     transform-style: preserve-3d;
+    backface-visibility: hidden;
     overflow: hidden;
 }
 
@@ -12,6 +13,7 @@
     height: 100%;
     position: relative;
     transform-style: preserve-3d;
+    backface-visibility: hidden;
 }
 
 .sides {

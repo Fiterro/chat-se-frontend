@@ -1,7 +1,7 @@
 import { UserShort } from "./user-short.type";
+import { SessionData } from "./session.type";
 
 export type UserData = Readonly<{
-    token: string,
-    email: string,
-    profile: UserShort
+    profile: UserShort,
+    session: SessionData
 }>;

@@ -19,6 +19,12 @@ import { TimelineItem } from "../core/classes/timeline-item.class";
 import { SocketEvents } from "../core/enums/socket-events.enum";
 import { MessageToSend } from "../core/types/message-to-send.type";
 
+// TODO: move it to own file
+type MessageCount = {
+    messageId: number,
+    viewCount: number
+};
+
 @Injectable()
 export class ChatsService {
     readonly messageSent = new Subject<Message>();
@@ -76,9 +82,9 @@ export class ChatsService {
     }
 
     createChat(name: string): Observable<Chat> {
-        return this.httpClient.post<ResponseModel<Chat>>(`${this.API_ROOT}`, {name})
+        return this.httpClient.post<ResponseModel<ChatData>>(`${this.API_ROOT}`, {name})
             .pipe(
-                map(({data}) => data),
+                map(({data}) => new Chat(data)),
                 tap((chat: Chat) => this.chatsList.next([...this.chatsList.getValue(), chat]))
             );
     }
@@ -127,6 +133,14 @@ export class ChatsService {
             .get<ResponseModel<any>>(`${this.API_ROOT}/${id}/activity`)
             .pipe(
                 map(({data}) => data.map((item) => new TimelineItem(item)))
+            );
+    }
+
+    readMessages(chatId: number, messageIds: number[]): Observable<MessageCount[]> {
+        return this.httpClient
+            .post<ResponseModel<MessageCount[]>>(`${this.API_ROOT}/read`, messageIds)
+            .pipe(
+                map(({data}) => data)
             );
     }
 

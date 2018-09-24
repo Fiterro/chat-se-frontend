@@ -13,6 +13,7 @@ import { ChatCreateDialogComponent } from "./chat-create-dialog/chat-create-dial
 import { ChatActivityComponent } from "./chat-activity/chat-activity.component";
 import { TimelineModule } from "../../shared/timeline/timeline.module";
 import { BorderScrolledModule } from "../../shared/border-scrolled/border-scrolled.module";
+import { FlipModule } from "../../shared/flip/flip.module";
 
 @NgModule({
     imports: [
@@ -28,7 +29,8 @@ import { BorderScrolledModule } from "../../shared/border-scrolled/border-scroll
         CapitalizeFirstModule,
         MatDialogModule,
         TimelineModule,
-        BorderScrolledModule
+        BorderScrolledModule,
+        FlipModule
     ],
     declarations: [
         ChatMainComponent,

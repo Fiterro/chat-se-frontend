@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
-import { BehaviorSubject, Observable, Subject } from "rxjs";
+import { BehaviorSubject, from, Observable, Subject } from "rxjs";
 import { filter, map, share, tap } from "rxjs/operators";
 
 import { v4 as uuidv4 } from "uuid";
@@ -18,6 +18,7 @@ import { SocketService } from "./socket.service";
 import { TimelineItem } from "../core/classes/timeline-item.class";
 import { SocketEvents } from "../core/enums/socket-events.enum";
 import { MessageToSend } from "../core/types/message-to-send.type";
+import { BrowserNotificationsService } from "./browser-notifications.service";
 
 // TODO: move it to own file
 type MessageCount = {
@@ -30,13 +31,17 @@ export class ChatsService {
     readonly messageSent = new Subject<Message>();
 
     private readonly API_ROOT = API_ROOT_CHAT;
+    private readonly messageSound = new Audio("/assets/sounds/message.mp3");
     private chatsList = new BehaviorSubject<Chat[] | undefined>(undefined);
     private activeChatId = new BehaviorSubject<number | undefined>(undefined);
 
     constructor(private readonly httpClient: HttpClient,
                 private readonly sessionService: SessionService,
-                private readonly socketService: SocketService) {
+                private readonly socketService: SocketService,
+                private readonly browserNotificationsService: BrowserNotificationsService) {
         socketService.connect();
+        this.messageSound.load();
+        this.browserNotificationsService.requestPermissions();
     }
 
     get chats(): Observable<Chat[]> {
@@ -71,6 +76,17 @@ export class ChatsService {
             .pipe(
                 map((messageData: MessageData) => {
                     return new Message(messageData);
+                }),
+                tap((message) => {
+                    // play sound if sender is not current user
+                    if (message.sender.id !== this.sessionService.userSnapshot.profile.id) {
+                        from(this.messageSound.play()).subscribe(() => {
+                            // push notification if message is not for active chat
+                            if (message.chatId !== this.activeChatId.getValue()) {
+                                this.notifyBrowser(message);
+                            }
+                        });
+                    }
                 })
             );
     }
@@ -149,5 +165,13 @@ export class ChatsService {
             .pipe(
                 map(({data}) => data.map((chat) => new Chat(chat)))
             );
+    }
+
+    private notifyBrowser(message: Message): void {
+        const notificationOptions: NotificationOptions = {
+            body: message.text,
+            icon: message.sender.avatar
+        };
+        this.browserNotificationsService.notify(message.sender.username, notificationOptions);
     }
 }

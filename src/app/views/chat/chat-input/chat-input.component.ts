@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component, OnInit } from "@angular/core";
-import { ChatsService } from "../../../services/chats.service";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { Observable, of } from "rxjs";
+
+import { ChatsService } from "../../../services/chats.service";
 
 @Component({
     selector: "app-chat-input",
@@ -16,7 +17,7 @@ export class ChatInputComponent implements OnInit {
     }
 
     get invalidForm(): Observable<boolean> {
-        return of(this.messageForm.invalid);
+        return of(this.messageForm.invalid && this.messageForm.get("message").value);
     }
 
     ngOnInit(): void {

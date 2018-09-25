@@ -2,6 +2,7 @@ import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { MatButtonModule, MatDialogModule, MatFormFieldModule, MatIconModule, MatInputModule, MatListModule } from "@angular/material";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { InViewportModule } from "ng-in-viewport";
 
 import { ChatMainComponent } from "./chat-main/chat-main.component";
 import { ChatFeedComponent } from "./chat-feed/chat-feed.component";
@@ -30,7 +31,8 @@ import { FlipModule } from "../../shared/flip/flip.module";
         MatDialogModule,
         TimelineModule,
         BorderScrolledModule,
-        FlipModule
+        FlipModule,
+        InViewportModule
     ],
     declarations: [
         ChatMainComponent,

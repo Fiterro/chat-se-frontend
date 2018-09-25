@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, ElementRef, OnInit, ViewChild } from "@angular/core";
-import { BehaviorSubject, combineLatest, Observable, of } from "rxjs";
-import { filter, map, merge, share, switchMap, tap, throttleTime } from "rxjs/operators";
+import { ChangeDetectionStrategy, Component, ElementRef, OnDestroy, OnInit, ViewChild } from "@angular/core";
+import { BehaviorSubject, combineLatest, Observable, of, Subject, Subscription } from "rxjs";
+import { debounceTime, filter, map, merge, share, switchMap, tap, throttleTime } from "rxjs/operators";
 
 import { ChatsService } from "../../../services/chats.service";
 import { Chat } from "../../../core/classes/chat";
@@ -14,7 +14,7 @@ import { BorderScrolledDirective } from "../../../shared/border-scrolled/border-
     styleUrls: ["./chat-feed.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ChatFeedComponent implements OnInit {
+export class ChatFeedComponent implements OnInit, OnDestroy {
     messages: Observable<Message[]>;
     @ViewChild("feed")
     private readonly chatFeed: ElementRef;
@@ -22,6 +22,9 @@ export class ChatFeedComponent implements OnInit {
     private readonly borderScrolled: BorderScrolledDirective;
     private readonly chatHistory = new BehaviorSubject<Message[]>([]);
     private readonly messagesCached = new BehaviorSubject<Message[]>([]);
+    private readonly messageToRead = new Map<number, BehaviorSubject<Message>>();
+    private readonly readMessage = new Subject<void>();
+    private readonly subscriptions: Subscription[] = [];
     private innerMessages: Message[] = [];
     private pagination: PaginationParams;
     private loadMore = false;
@@ -50,7 +53,7 @@ export class ChatFeedComponent implements OnInit {
                 filter((message) => {
                     const existingMessageIndex = this.innerMessages.findIndex((innerMsg) => innerMsg.uuid === message.uuid);
                     if (existingMessageIndex >= 0) {
-                        this.innerMessages[existingMessageIndex].setStatus(message.viewCount);
+                        this.innerMessages[existingMessageIndex].setViewCount(message.viewCount.getValue());
                     }
                     return existingMessageIndex < 0;
                 }),
@@ -64,18 +67,59 @@ export class ChatFeedComponent implements OnInit {
         this.initChat();
         this.createMessageObservable();
 
-        this.borderScrolled.appBorderScrolled
+        const s1 = this.borderScrolled.appBorderScrolled
             .pipe(
                 filter(() => !this.inProgress),
                 throttleTime(THROTTLE_EVENTS_TIME)
             )
             .subscribe(() => this.loadChatMessages(this.chatId));
+
+        const s2 = this.readMessage
+            .pipe(
+                debounceTime(THROTTLE_EVENTS_TIME),
+                filter(() => this.messageToRead.size > 0),
+                switchMap(() => {
+                    const messages = [];
+                    this.messageToRead.forEach((message) => messages.push(message.getValue().id));
+                    return this.chatsService.readMessages(this.chatId, messages);
+                })
+            )
+            .subscribe((result) => {
+                if (result.length) {
+                    result.forEach((item) => {
+                        const messageData = this.innerMessages
+                            .find((message) => message.id === item.messageId);
+                        if (messageData) {
+                            messageData.setNew(false);
+                        }
+                    });
+                }
+                this.messageToRead.clear();
+            });
+
+        this.subscriptions.push(s1, s2);
     }
 
     scrollToBottom(): void {
         window.requestAnimationFrame(() => {
             this.chatFeed.nativeElement.scrollTop = this.chatFeed.nativeElement.scrollHeight;
         });
+    }
+
+    onIntersection(data: Message): void {
+        if (!data.isNewMessage.getValue()) {
+            return;
+        }
+        if (this.messageToRead.has(data.id)) {
+            return this.messageToRead.get(data.id).next(data);
+        }
+        this.messageToRead.set(data.id, new BehaviorSubject(data));
+        this.readMessage.next();
+    }
+
+    ngOnDestroy(): void {
+        this.messageToRead.clear();
+        this.subscriptions.forEach(s => s.unsubscribe());
     }
 
     private initChat(): void {
@@ -127,20 +171,14 @@ export class ChatFeedComponent implements OnInit {
         this.inProgress = true;
         this.pagination.setOffset(this.innerMessages.length);
         this.chatsService.getMessages(chatId, this.pagination)
-            .pipe(
-                switchMap(({data, pagination}) => {
-                    this.addMessagesToHistory(data.reverse());
-                    if (firstTime) {
-                        this.scrollToBottom();
-                    }
-                    this.firstTimeLoad = false;
-                    this.loadMore = this.innerMessages.length < pagination.total;
-                    this.inProgress = false;
-                    return this.chatsService.readMessages(this.chatId, data.map((message) => message.id));
-                })
-            )
-            .subscribe((messageCounter) => {
-                // TODO: update messages viewCounters
+            .subscribe(({data, pagination}) => {
+                this.addMessagesToHistory(data.reverse());
+                if (firstTime) {
+                    this.scrollToBottom();
+                }
+                this.firstTimeLoad = false;
+                this.loadMore = this.innerMessages.length < pagination.total;
+                this.inProgress = false;
             });
     }
 

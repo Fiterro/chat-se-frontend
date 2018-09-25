@@ -120,7 +120,8 @@ export class ChatsService {
             chatId,
             text,
             sender: this.sessionService.userSnapshot.profile,
-            uuid: dataToSend.uuid
+            uuid: dataToSend.uuid,
+            isNew: false
         });
         this.messageSent.next(message);
 

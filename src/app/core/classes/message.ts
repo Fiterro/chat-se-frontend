@@ -7,7 +7,7 @@ import { UserShort } from "../types/user-short.type";
 import { MessageStatus } from "../enums/message-status.enum";
 
 export class Message {
-    readonly id: number;
+    readonly idNumber = new BehaviorSubject<number | undefined>(undefined);
     readonly chatId: number;
     readonly sender: UserShort;
     readonly text: string;
@@ -19,7 +19,7 @@ export class Message {
 
     constructor(data: MessageData) {
         if (data.id) {
-            this.id = data.id;
+            this.idNumber.next(data.id);
         }
         this.chatId = data.chatId;
         this.text = data.text;
@@ -32,6 +32,10 @@ export class Message {
 
     get isNew(): Observable<boolean> {
         return this.isNewMessage.asObservable();
+    }
+
+    get id(): number {
+        return this.idNumber.getValue();
     }
 
     setNew(value: boolean): void {
@@ -47,5 +51,9 @@ export class Message {
         } else {
             this.status.next(MessageStatus.Pending);
         }
+    }
+
+    updateId(id: number) {
+        this.idNumber.next(id);
     }
 }

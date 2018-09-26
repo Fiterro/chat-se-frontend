@@ -16,7 +16,6 @@ import { PaginationParams } from "../core/classes/pagination-params";
 import { ResponseListModel } from "../core/types/response-list-model.type";
 import { SocketService } from "./socket.service";
 import { TimelineItem } from "../core/classes/timeline-item.class";
-import { SocketEvents } from "../core/enums/socket-events.enum";
 import { MessageToSend } from "../core/types/message-to-send.type";
 import { BrowserNotificationsService } from "./browser-notifications.service";
 import { MessageRead } from "../core/classes/message-read";
@@ -87,6 +86,13 @@ export class ChatsService {
             );
     }
 
+    get messageRead(): Observable<MessageRead[]> {
+        return this.socketService.messagesRead
+            .pipe(
+                map((data: MessageReadData[]) => data.map((item) => new MessageRead(item)))
+            );
+    }
+
     selectChat(chatId: number): void {
         if (chatId && chatId !== this.activeChatId.getValue()) {
             this.activeChatId.next(chatId);
@@ -101,14 +107,12 @@ export class ChatsService {
             );
     }
 
-    sendMessage(text: string): void {
+    sendMessage(text: string): Observable<Message> {
         const chatId = this.activeChatId.getValue();
-        const senderId = this.sessionService.userSnapshot.profile.id;
         // Prepare data to send through sockets
         const dataToSend: MessageToSend = {
             chatId,
             text,
-            senderId,
             uuid: uuidv4()
         };
         // Create message and store in feed
@@ -121,8 +125,11 @@ export class ChatsService {
         });
         this.messageSent.next(message);
 
-        return this.socketService
-            .emitEvent(SocketEvents.CreateMessage, dataToSend);
+        return this.httpClient
+            .post<ResponseModel<MessageData>>(`${this.API_ROOT}/messages`, dataToSend)
+            .pipe(
+                map(({data}) => new Message(data))
+            );
     }
 
     getMessages(chatId?: number, params?: PaginationParams): Observable<{ data: Message[], pagination: { total: number } }> {

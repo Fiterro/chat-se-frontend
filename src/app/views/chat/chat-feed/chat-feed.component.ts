@@ -7,6 +7,7 @@ import { Chat } from "../../../core/classes/chat";
 import { Message } from "../../../core/classes/message";
 import { PaginationParams } from "../../../core/classes/pagination-params";
 import { BorderScrolledDirective } from "../../../shared/border-scrolled/border-scrolled.directive";
+import { MessageRead } from "../../../core/classes/message-read";
 
 const THROTTLE_EVENTS_TIME = 500;
 
@@ -55,6 +56,7 @@ export class ChatFeedComponent implements OnInit, OnDestroy {
                 filter((message) => {
                     const existingMessageIndex = this.innerMessages.findIndex((innerMsg) => innerMsg.uuid === message.uuid);
                     if (existingMessageIndex >= 0) {
+                        this.innerMessages[existingMessageIndex].updateId(message.id);
                         this.innerMessages[existingMessageIndex].setViewCount(message.viewCount.getValue());
                     }
                     return existingMessageIndex < 0;
@@ -150,12 +152,11 @@ export class ChatFeedComponent implements OnInit, OnDestroy {
             .pipe(
                 map(([history, cache]) => history.concat(cache)),
                 map((messages) => {
-                    // TODO: sort data
                     this.innerMessages = messages;
                     return this.innerMessages;
                 }),
                 merge(this.chatsService.messageSent.pipe(
-                    map((sent) => {
+                    map((sent: Message) => {
                         this.cacheMessages([sent]);
 
                         return this.innerMessages;
@@ -163,9 +164,20 @@ export class ChatFeedComponent implements OnInit, OnDestroy {
                     tap(() => this.scrollToBottom())
                 )),
                 merge(this.newMessage.pipe(
-                    map((sent) => {
+                    map((sent: Message[]) => {
                         this.cacheMessages(sent);
 
+                        return this.innerMessages;
+                    })
+                )),
+                merge(this.chatsService.messageRead.pipe(
+                    map((data: MessageRead[]) => {
+                        data.forEach((messageRead) => {
+                            const msgIndex = this.innerMessages.findIndex((msg) => messageRead.messageId === msg.id);
+                            if (msgIndex >= 0 && messageRead.countViews > this.innerMessages[msgIndex].viewCount.getValue()) {
+                                this.innerMessages[msgIndex].setViewCount(messageRead.countViews);
+                            }
+                        });
                         return this.innerMessages;
                     })
                 )),

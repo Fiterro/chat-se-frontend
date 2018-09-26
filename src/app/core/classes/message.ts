@@ -14,7 +14,7 @@ export class Message {
     readonly sentAt: Date;
     readonly uuid: string;
     readonly status = new BehaviorSubject<MessageStatus>(MessageStatus.Pending);
-    readonly isNewMessage = new BehaviorSubject<boolean>(false);
+    readonly isNewMessage = new BehaviorSubject<boolean>(true);
     readonly viewCount = new BehaviorSubject<number | undefined>(undefined);
 
     constructor(data: MessageData) {

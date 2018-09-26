@@ -24,7 +24,7 @@ export class BrowserNotificationsService {
         }
     }
 
-    notify(title: string, options?: NotificationOptions) {
-        const notification = new Notification(title, options);
+    notify(title: string, options?: NotificationOptions): Notification {
+        return new Notification(title, options);
     }
 }

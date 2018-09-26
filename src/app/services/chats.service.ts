@@ -19,12 +19,8 @@ import { TimelineItem } from "../core/classes/timeline-item.class";
 import { SocketEvents } from "../core/enums/socket-events.enum";
 import { MessageToSend } from "../core/types/message-to-send.type";
 import { BrowserNotificationsService } from "./browser-notifications.service";
-
-// TODO: move it to own file
-type MessageCount = {
-    messageId: number,
-    viewCount: number
-};
+import { MessageRead } from "../core/classes/message-read";
+import { MessageReadData } from "../core/types/message-read.type";
 
 @Injectable()
 export class ChatsService {
@@ -153,11 +149,11 @@ export class ChatsService {
             );
     }
 
-    readMessages(chatId: number, messageIds: number[]): Observable<MessageCount[]> {
+    readMessages(chatId: number, messageIds: number[]): Observable<MessageRead[]> {
         return this.httpClient
-            .post<ResponseModel<MessageCount[]>>(`${this.API_ROOT}/read`, messageIds)
+            .post<ResponseModel<MessageReadData[]>>(`${this.API_ROOT}/read`, messageIds)
             .pipe(
-                map(({data}) => data)
+                map(({data}) => data.map((item) => new MessageRead(item)))
             );
     }
 

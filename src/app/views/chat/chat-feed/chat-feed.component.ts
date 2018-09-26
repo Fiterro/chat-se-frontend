@@ -8,6 +8,8 @@ import { Message } from "../../../core/classes/message";
 import { PaginationParams } from "../../../core/classes/pagination-params";
 import { BorderScrolledDirective } from "../../../shared/border-scrolled/border-scrolled.directive";
 
+const THROTTLE_EVENTS_TIME = 500;
+
 @Component({
     selector: "app-chat-feed",
     templateUrl: "./chat-feed.component.html",
@@ -62,19 +64,17 @@ export class ChatFeedComponent implements OnInit, OnDestroy {
             );
     }
 
-    ngOnInit(): void {
-        const THROTTLE_EVENTS_TIME = 500;
-        this.initChat();
-        this.createMessageObservable();
-
-        const s1 = this.borderScrolled.appBorderScrolled
+    private get borderScrolledSubscription(): Subscription {
+        return this.borderScrolled.appBorderScrolled
             .pipe(
                 filter(() => !this.inProgress),
                 throttleTime(THROTTLE_EVENTS_TIME)
             )
             .subscribe(() => this.loadChatMessages(this.chatId));
+    }
 
-        const s2 = this.readMessage
+    private get readMessagesSubscription(): Subscription {
+        return this.readMessage
             .pipe(
                 debounceTime(THROTTLE_EVENTS_TIME),
                 filter(() => this.messageToRead.size > 0),
@@ -91,13 +91,22 @@ export class ChatFeedComponent implements OnInit, OnDestroy {
                             .find((message) => message.id === item.messageId);
                         if (messageData) {
                             messageData.setNew(false);
+                            messageData.setViewCount(item.countViews);
                         }
                     });
                 }
                 this.messageToRead.clear();
             });
+    }
 
-        this.subscriptions.push(s1, s2);
+    ngOnInit(): void {
+        this.initChat();
+        this.createMessageObservable();
+        this.subscriptions
+            .push(
+                this.borderScrolledSubscription,
+                this.readMessagesSubscription
+            );
     }
 
     scrollToBottom(): void {

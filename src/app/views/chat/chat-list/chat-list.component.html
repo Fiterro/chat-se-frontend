@@ -1,3 +1,9 @@
-<p>
-    chat-list works!
-</p>
+<mat-nav-list>
+    <mat-list-item *ngFor="let chat of (chats | async)" (click)="selectChat(chat.id)">
+        <div class="list-item" [class.active]="isSelected(chat.id) | async">
+            {{chat.name}}
+            <button mat-flat-button="primary" (click)="$event.stopPropagation(); onActivityClick(chat)">Chat activity</button>
+        </div>
+    </mat-list-item>
+    <button mat-flat-button="primary" (click)="onCreateClick()" *ngIf="isAdmin | async">Create new chat</button>
+</mat-nav-list>

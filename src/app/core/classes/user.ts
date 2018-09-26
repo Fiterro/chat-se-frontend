@@ -1,11 +1,13 @@
 import { UserData } from "../types/user.type";
+import { UserShort } from "../types/user-short.type";
+import { SessionData } from "../types/session.type";
 
 export class User {
-    id: number;
-    token: string;
+    readonly profile: UserShort;
+    session: SessionData;
 
     constructor(user: UserData) {
-        this.id = user.id;
-        this.token = user.token;
+        this.profile = user.profile;
+        this.session = user.session;
     }
 }

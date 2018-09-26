@@ -17,7 +17,7 @@ export class ApiInterceptor implements HttpInterceptor {
 
         const user = this.sessionService.userSnapshot;
         if (user) {
-            const authorization = ["Bearer", user.token].join(" ");
+            const authorization = ["Bearer", user.session.accessToken].join(" ");
             request = request.clone({
                 headers: request.headers.set("Authorization", authorization)
             });

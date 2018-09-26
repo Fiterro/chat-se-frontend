@@ -1,0 +1,12 @@
+.chat-activity {
+  min-width: 600px;
+  max-width: 100vw;
+}
+
+@media (max-width: 767px) {
+
+  .chat-activity {
+    min-width: 320px;
+  }
+
+}

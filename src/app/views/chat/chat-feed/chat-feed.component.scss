@@ -1,0 +1,13 @@
+:host {
+    display: block;
+    height: 100%;
+    min-height: 100%;
+}
+
+.chat__feed-container {
+    display: block;
+    height: 100%;
+    min-height: 100%;
+    max-height: 0;
+    overflow-y: auto;
+}

@@ -10,7 +10,7 @@
     }
 
     #content {
-        @include grid-child(1, 1, 2, auto);
+        @include grid-child(1, 1, 2, 2);
         overflow-x: hidden;
         overflow-y: auto;
     }

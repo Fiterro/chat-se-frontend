@@ -1,0 +1,29 @@
+<div class="chat-message"  [class.new]="message.isNew | async">
+    <div class="chat-message__avatar">
+        <div *ngIf="message.sender.avatar; then avatarView else noAvatar"></div>
+        <ng-template #avatarView>
+            <img [src]="message.sender.avatar" alt="avatar">
+        </ng-template>
+        <ng-template #noAvatar>
+            <span class="chat-message__avatar-letter">
+                {{'firstName' | capitalizeFirst}}
+            </span>
+        </ng-template>
+    </div>
+    <div class="chat-message__body">
+        <div class="chat-message__text">{{message.sender.firstName}} {{message.sender.lastName}}</div>
+        <div class="chat-message__text message-text">{{message.text}}</div>
+        <div class="chat-message__date">{{message.sentAt | date:'short'}}</div>
+        <div class="chat-message__info">
+        <app-flip [state]="flipped | async">
+            <div flip-front class="front">
+                <div class="chat-message__text">{{message.status | async}}</div>
+            </div>
+            <div flip-back class="back">
+                <div class="chat-message__text">Read: {{message.viewCount | async}} times</div>
+            </div>
+        </app-flip>
+        </div>
+    </div>
+    <mat-divider class="chat-message__divider"></mat-divider>
+</div>

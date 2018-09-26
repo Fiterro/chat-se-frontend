@@ -1,3 +1,13 @@
-<p>
-    chat-input works!
-</p>
+<form [formGroup]="messageForm" (ngSubmit)="sendMessage()" class="chat__form">
+    <div class="chat__field-wr">
+        <mat-form-field class="chat__form-field">
+            <input matInput placeholder="Message" [formControlName]="'message'">
+            <mat-error *ngIf="invalidForm | async">Message is required</mat-error>
+        </mat-form-field>
+    </div>
+    <div class="chat__button-wr">
+        <button mat-icon-button color="primary">
+            <mat-icon aria-label="send message">send</mat-icon>
+        </button>
+    </div>
+</form>

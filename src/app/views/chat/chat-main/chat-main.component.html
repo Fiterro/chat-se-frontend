@@ -1,8 +1,13 @@
-<div class="chat__container">
-    <div class="chat__feed">
-        <app-chat-feed></app-chat-feed>
+<div *ngIf="(activeChatName | async); then chatView else noChatView "></div>
+<ng-template #chatView>
+    <div class="chat__container">
+        <div class="chat__name">{{(activeChatName | async)}}</div>
+        <div class="chat__feed">
+            <app-chat-feed></app-chat-feed>
+        </div>
+        <div class="chat__input">
+            <app-chat-input></app-chat-input>
+        </div>
     </div>
-    <div class="chat__input">
-        <app-chat-input></app-chat-input>
-    </div>
-</div>
+</ng-template>
+<ng-template #noChatView>No chat selected</ng-template>

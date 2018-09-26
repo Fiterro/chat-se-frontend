@@ -7,6 +7,7 @@ export const environment = {
 };
 
 export const API_URL = "API_URL";
+export const SOCKET_URL = "SOCKET_URL";
 
 /*
  * In development mode, to ignore zone related error stack frames such as

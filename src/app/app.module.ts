@@ -9,7 +9,8 @@ import { AppRoutes } from "./app.routes";
 import { DashboardModule } from "./views/dashboard/dashboard.module";
 import { ApiInterceptor } from "./interceptors/api.interceptor";
 import { AuthCallbackComponent } from "./shared/auth-callback/auth-callback.component";
-import { PageNotFoundComponent } from './views/page-not-found/page-not-found.component';
+import { PageNotFoundComponent } from "./views/page-not-found/page-not-found.component";
+import { RefreshTokenInterceptor } from "./interceptors/refresh-token.interceptor";
 
 @NgModule({
     declarations: [
@@ -28,6 +29,11 @@ import { PageNotFoundComponent } from './views/page-not-found/page-not-found.com
         {
             provide: HTTP_INTERCEPTORS,
             useClass: ApiInterceptor,
+            multi: true
+        },
+        {
+            provide: HTTP_INTERCEPTORS,
+            useClass: RefreshTokenInterceptor,
             multi: true
         }
     ],

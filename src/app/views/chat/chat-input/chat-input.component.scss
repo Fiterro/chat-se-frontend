@@ -1,0 +1,27 @@
+@import "../../../../assets/scss/grid";
+
+:host {
+    width: 100%;
+}
+
+.chat {
+
+    &__form {
+        @include display-grid;
+        grid-template-columns: 1fr 50px;
+    }
+
+    &__field {
+        width: 100%;
+
+        &-wr {
+            @include grid-child(1, 1, 1, 1);
+        }
+    }
+
+    &__button-wr {
+
+        @include grid-child(2, 2, 1, 1);
+    }
+
+}

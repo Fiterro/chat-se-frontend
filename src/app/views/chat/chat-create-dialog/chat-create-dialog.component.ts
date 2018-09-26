@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit } from "@angular/core";
-import { MatDialogRef } from "@angular/material";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
+import { MatDialogRef } from "@angular/material";
 import { Observable, of } from "rxjs";
 
 @Component({
@@ -15,12 +15,12 @@ export class ChatCreateDialogComponent implements OnInit {
     constructor(public matDialogRef: MatDialogRef<ChatCreateDialogComponent>) {
     }
 
-    ngOnInit() {
-        this.formGroup = new FormGroup({chatName: new FormControl("", [Validators.required])});
-    }
-
     get invalidForm(): Observable<boolean> {
         return of(this.formGroup.invalid);
+    }
+
+    ngOnInit() {
+        this.formGroup = new FormGroup({chatName: new FormControl("", [Validators.required])});
     }
 
     submitForm(): void {

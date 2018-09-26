@@ -7,5 +7,6 @@ export type MessageData = Readonly<{
     id?: number,
     viewCount?: number,
     uuid?: string,
-    sentAt?: string
+    sentAt?: string,
+    isNew: boolean
 }>;

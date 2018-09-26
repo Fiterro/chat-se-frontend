@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component } from "@angular/core";
 import { Observable } from "rxjs";
 import { MatDialog } from "@angular/material";
+import { map } from "rxjs/operators";
 
 import { ChatsService } from "../../../services/chats.service";
 import { Chat } from "../../../core/classes/chat";
@@ -27,6 +28,13 @@ export class ChatListComponent {
 
     get isAdmin(): Observable<boolean> {
         return this.sessionService.isAdmin.asObservable();
+    }
+
+    isSelected(selectedId: number): Observable<boolean> {
+        return this.chatsService.activeChat
+            .pipe(
+                map((chat) => chat.id === selectedId)
+            );
     }
 
     selectChat(chatId: number): void {

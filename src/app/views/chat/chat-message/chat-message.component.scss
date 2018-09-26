@@ -7,6 +7,12 @@ $avatar-size: 70px;
     grid-template-columns: $avatar-size 1fr;
     grid-gap: 10px;
 
+    &.new {
+        .chat-message__text.message-text {
+            font-weight: bold;
+        }
+    }
+
     &__avatar {
         @include grid-child(1, 1, 1, 1);
         width: $avatar-size;

@@ -14,11 +14,6 @@ import { TimelineData } from "../../core/types/timeline-data.type";
 export class TimelineComponent implements OnChanges {
     @Input() elements: TimelineElem[];
     readonly activityArr: TimelineElem[] = [];
-    private readonly now: moment.Moment;
-
-    constructor() {
-        this.now = moment();
-    }
 
     get timeline(): TimelineElem[] {
         return this.activityArr.reverse();

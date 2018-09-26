@@ -1,3 +1,10 @@
-<p>
-    chat-feed works!
-</p>
+<div #feed class="chat__feed-container" appBorderScrolled #borderScrolled [gap]="400">
+    <app-chat-message *ngFor="let message of (messages | async)"
+                      [message]="message"
+                      inViewport
+                      [inViewportOptions]="{ threshold: [100] }"
+                      (inViewportAction)="$event.visible && onIntersection(message)"></app-chat-message>
+    <div *ngIf="noMessages | async">
+        <p>Start with your nice message</p>
+    </div>
+</div>

@@ -1,0 +1,8 @@
+<div class="flipper" [@flip]="innerState | async">
+    <div class="sides front">
+        <ng-content select="[flip-front]"></ng-content>
+    </div>
+    <div class="sides back">
+        <ng-content select="[flip-back]"></ng-content>
+    </div>
+</div>
